@@ -6,7 +6,7 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
         paths: {
-            base: process.env.NODE_ENV === "production" ? "/repo-name" : "",
+            base: process.env.NODE_ENV === "production" ? "/aquagraph" : "",
             relative: false,
         },
 		adapter: adapter({
