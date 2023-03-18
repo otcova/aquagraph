@@ -1,0 +1,13 @@
+
+body {
+    margin: 0;
+    background: linear-gradient(112deg, #111 11%, #222 80%);
+    color: #fff;
+    font-family: "Montserrat";
+    overflow: hidden;
+}
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("/repo-name/_app/immutable/assets/Montserrat.a4fe82b4.ttf");
+}
