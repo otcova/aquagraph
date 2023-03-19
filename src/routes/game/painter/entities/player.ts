@@ -1,21 +1,24 @@
 import type { Player } from "../..";
 import { random } from "../../../utils";
 import { Group } from "../drawing_element";
-import type { EntityPainter } from "../painter";
+import type { EntityPainter, PainterCanvas } from "../painter";
 
 
 export class PlayerPainter implements EntityPainter<Player> {
     image: Group;
-    eye: Animated;
+    eye: SVGElement;
 
-    constructor(player: Player) {
+    constructor(canvas: PainterCanvas, player: Player) {
         this.image = new Group();
-
         this.image.content(player.skin.image);
-        const eyeElement = this.image.element.getElementsByClassName("eye")[0] as SVGElement;
-        this.eye = new Animated(eyeElement, 1);
 
         this.update(player);
+
+        this.eye = this.image.element.getElementsByClassName("eye")[0] as SVGElement;
+        this.eye.setAttribute("style", `transition: all 1000ms linear;`);
+
+        canvas.addElement(3, this.image.element);
+        canvas.setInterval(this.moveEye.bind(this), 1000);
     }
 
     update(player: Player) {
@@ -23,28 +26,9 @@ export class PlayerPainter implements EntityPainter<Player> {
         this.image.angle(player.angle);
     }
 
-    frame() {
-        this.eye.transform(`translate(${random(-2, 2)}, ${random(-2, 2)}) rotate(${random(-20, 20)})`);
-    }
-}
-
-class Animated {
-    element: SVGElement;
-    updateCooldown: number = 0;
-    pastUpdateInstance: number = 0;
-
-    constructor(element: SVGElement, updateSecondsCooldown: number) {
-        this.element = element;
-        this.updateCooldown = updateSecondsCooldown;
-
-        this.element.setAttribute("style", `transition: all ${this.updateCooldown}s linear;`);
-    }
-
-    transform(transform: string) {
-        const now = performance.now() / 1000;
-        if (now - this.pastUpdateInstance > this.updateCooldown) {
-            this.pastUpdateInstance = now;
-            this.element.setAttribute("transform", transform);
-        }
+    moveEye() {
+        this.eye.setAttribute("transform",
+            `translate(${random(-2, 2)}, ${random(-2, 2)}) rotate(${random(-20, 20)})`
+        );
     }
 }

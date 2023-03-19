@@ -43,11 +43,9 @@ const skinColors = [
     "#d35f8d",
 ];
 
-export const playerSkins = {
-    get(shapeIndex: number, colorIndex: number): Skin {
-        return {
-            hitbox: skinShapes[shapeIndex].hitbox,
-            image: skinShapes[shapeIndex].image.replaceAll("$body", skinColors[colorIndex]),
-        };
-    }
-};
+export function playerSkin(shapeIndex: number, colorIndex: number): Skin {
+    return {
+        hitbox: skinShapes[shapeIndex].hitbox,
+        image: skinShapes[shapeIndex].image.replaceAll("$body", skinColors[colorIndex]),
+    };
+}
