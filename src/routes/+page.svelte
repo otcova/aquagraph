@@ -3,11 +3,10 @@
     import { Painter } from "./game/painter";
     import { createGameServer } from "./game/server";
 
-    const server = createGameServer.staticFrame();
-
     let canvasContainer: HTMLElement;
 
     onMount(() => {
+        const server = createGameServer.staticFrame();
         const painter = new Painter(server, canvasContainer);
     });
 </script>

@@ -1,18 +1,20 @@
 import { Layer, Stage } from "@pixi/layers";
 import { AmbientLight, diffuseGroup, lightGroup, normalGroup } from "@pixi/lights";
-import { Application } from "pixi.js";
+import { Application, Container } from "pixi.js";
 import type { Game } from "..";
 import type { Vec2 } from "../../utils";
 import { GameDif } from "../dif";
 import type { GameServer } from "../server";
+import { Background } from "./background";
 import { EntitiesPainter } from "./entities";
 
 export class Painter {
     private server: GameServer;
-    private app: Application;
     private previousGameDrawn?: Game;
+    private app: Application;
     private entities: EntitiesPainter;
     private camera: Camera;
+    private background: Background;
 
     constructor(server: GameServer, container: HTMLElement) {
         this.server = server;
@@ -30,11 +32,12 @@ export class Painter {
             new Layer(diffuseGroup),
             new Layer(normalGroup),
             new Layer(lightGroup),
-            new AmbientLight(0xffffff, 0.2),
+            new AmbientLight(0xffffff, 0.1),
         );
 
+        this.background = new Background(this.app.stage);
         this.camera = new Camera(this.app);
-        this.entities = new EntitiesPainter(this.app.stage);
+        this.entities = new EntitiesPainter(this.camera.container);
 
         container.appendChild(this.app.view as HTMLCanvasElement);
         this.app.ticker.add(this.update.bind(this));
@@ -56,9 +59,13 @@ export class Painter {
 class Camera {
     private topLeft!: Vec2;
     private bottomRight!: Vec2;
+    container: Container;
 
     constructor(private app: Application) {
         this.app.renderer.on("resize", this.updateTransform.bind(this));
+
+        this.container = new Container();
+        this.app.stage.addChild(this.container);
     }
 
     update(gameDif: GameDif) {
@@ -82,7 +89,7 @@ class Camera {
         const offsetX = (frameWidth / scale - width) / 2 - this.topLeft[0];
         const offsetY = (frameHeight / scale - height) / 2 - this.topLeft[1];
 
-        this.app.stage.position.set(offsetX * scale, offsetY * scale);
-        this.app.stage.scale.set(scale, scale);
+        this.container.position.set(offsetX * scale, offsetY * scale);
+        this.container.scale.set(scale, scale);
     }
 }

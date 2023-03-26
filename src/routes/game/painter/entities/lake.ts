@@ -2,7 +2,7 @@ import { DRAW_MODES, Mesh, MeshGeometry, MeshMaterial, Texture, utils, type Cont
 import type { Lake } from "../..";
 import type { Vec2 } from "../../../utils";
 import { smoothSubdividePolygon } from "../../server/game_creation/lake";
-import { quadOut as ease } from "svelte/easing";
+import { quadOut } from "svelte/easing";
 
 export class LakePainter {
     mesh: Mesh;
@@ -52,11 +52,12 @@ export class LakePainter {
 
         for (let i = 0; i < values.length; ++i) {
             const t = values[i];
-            const scale = 1 + ease(t) * 0.1;
+            const scale = 1 + quadOut(t) * 0.1;
             this.shadows[i].scale.set(scale, scale);
 
             const color = Math.round(0x80 * 0.9 * (1 - t));
             this.shadows[i].tint = (color << 8) + color;
+            this.shadows[i].alpha = quadOut(1 - t);
         }
     }
 
