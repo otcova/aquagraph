@@ -1,8 +1,22 @@
 <script lang="ts">
-    import Painter from "./game/painter/index.svelte";
+    import { onMount } from "svelte";
+    import { Painter } from "./game/painter";
     import { createGameServer } from "./game/server";
 
     const server = createGameServer.staticFrame();
+
+    let canvasContainer: HTMLElement;
+
+    onMount(() => {
+        const painter = new Painter(server, canvasContainer);
+    });
 </script>
 
-<Painter {server} />
+<div id="canvas-container" bind:this={canvasContainer} />
+
+<style>
+    #canvas-container {
+        width: 100vw;
+        height: 100vh;
+    }
+</style>

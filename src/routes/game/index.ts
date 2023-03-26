@@ -1,4 +1,6 @@
 import type { Vec2 } from "../utils";
+import type { BoxSkin } from "./skins/box";
+import type { PlayerSkin } from "./skins/player";
 
 /**
  * An instant/fame of a game
@@ -23,7 +25,7 @@ export interface Player {
     velocity: Vec2,
     angle: number,
     angular_velocity: number,
-    skin: Skin,
+    skin: PlayerSkin,
 }
 
 export interface User {
@@ -33,18 +35,12 @@ export interface User {
 export interface Box {
     position: Vec2,
     angle: number,
-    skin: Skin,
+    skin: BoxSkin,
+    lamp?: Vec2,
 }
 
 export interface Lake {
     position: Vec2,
-    polygon: Vec2[],
+    vertices: Float32Array,
 }
-
-
-export interface Skin {
-    hitbox: Vec2[][],
-    image: string, // SVG
-};
-
 

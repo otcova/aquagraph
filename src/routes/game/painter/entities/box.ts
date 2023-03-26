@@ -1,23 +1,18 @@
+import type { Container } from "pixi.js";
 import type { Box } from "../..";
-import { Group } from "../drawing_element";
-import type { PainterCanvas } from "../painter";
-
+import { boxGraphics, type BoxGraphics } from "../../skins/box";
 
 export class BoxPainter {
-    image: Group;
+    graphics: BoxGraphics;
 
-    constructor(canvas: PainterCanvas, box: Box) {
-        this.image = new Group();
-        canvas.addElement(8, this.image.element);
+    constructor(container: Container, box: Box) {
+        this.graphics = boxGraphics(box.skin);
+        container.addChild(this.graphics.body);
 
-        this.image.content(box.skin.image);
-
-        this.update(box);
+        this.graphics.body.position.set(...box.position);
+        this.graphics.body.rotation = box.angle;
     }
 
-    update(box: Box) {
-        this.image.position(...box.position);
-        this.image.angle(box.angle);
-    }
+    delete() {}
 }
 

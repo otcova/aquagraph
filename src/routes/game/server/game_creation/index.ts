@@ -1,8 +1,7 @@
 import type { GameServer } from "..";
 import type { Box, Game, Lake, Player } from "../..";
-import { boxSkin } from "./box";
+import { playerSkinColors } from "../../skins/player";
 import { createRandomBlob } from "./lake";
-import { defaultPlayer, playerSkin } from "./player";
 
 function emptyGame(): Game {
     return {
@@ -18,40 +17,34 @@ function emptyGame(): Game {
     };
 }
 
-export function lobby(): GameServer {
-    const game = emptyGame();
-    game.entities.players.set(1, defaultPlayer());
-    return { game };
-}
-
 /**
  * Return an offline and static GameServer that will show a single frame
 */
 export function staticFrame(): GameServer {
     const players: Player[] = [{
         user: { name: "A" },
-        skin: playerSkin(0, 0),
+        skin: { index: 0, color: playerSkinColors[0] },
         position: [0, 0],
         velocity: [0, 0],
         angle: -0.5,
         angular_velocity: 0,
     }, {
         user: { name: "B" },
-        skin: playerSkin(0, 3),
+        skin: { index: 0, color: playerSkinColors[3] },
         position: [-150, -100],
         velocity: [0, 0],
         angle: 0,
         angular_velocity: 0,
     }, {
         user: { name: "C" },
-        skin: playerSkin(1, 2),
+        skin: { index: 1, color: playerSkinColors[2] },
         position: [-250, -400],
         velocity: [0, 0],
         angle: 2,
         angular_velocity: 0,
     }, {
         user: { name: "D" },
-        skin: playerSkin(2, 1),
+        skin: { index: 2, color: playerSkinColors[1] },
         position: [300, 400],
         velocity: [0, 0],
         angle: -1,
@@ -59,31 +52,32 @@ export function staticFrame(): GameServer {
     }];
 
     const boxes: Box[] = [{
-        skin: boxSkin(1, { lamp: true }),
+        skin: { index: 1 },
         position: [-500, 200],
         angle: -0.3,
+        lamp: [0, 0],
     }, {
-        skin: boxSkin(1),
+        skin: { index: 1 },
         position: [400, -500],
         angle: 1.2,
     }, {
-        skin: boxSkin(0),
+        skin: { index: 0 },
         position: [350, 100],
         angle: 0.1,
     }];
 
     const lakes: Lake[] = [{
         position: [300, 200],
-        polygon: createRandomBlob(0),
+        vertices: createRandomBlob(0),
     }, {
         position: [-300, 200],
-        polygon: createRandomBlob(1),
+        vertices: createRandomBlob(1),
     }, {
         position: [300, -300],
-        polygon: createRandomBlob(2),
+        vertices: createRandomBlob(2),
     }, {
         position: [-400, -200],
-        polygon: createRandomBlob(3),
+        vertices: createRandomBlob(3),
     }];
 
     return {

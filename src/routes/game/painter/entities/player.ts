@@ -1,34 +1,24 @@
+import type { Container } from "pixi.js";
 import type { Player } from "../..";
-import { random } from "../../../utils";
-import { Group } from "../drawing_element";
-import type { EntityPainter, PainterCanvas } from "../painter";
+import { playerGraphics, type PlayerGraphics } from "../../skins/player";
 
 
-export class PlayerPainter implements EntityPainter<Player> {
-    image: Group;
-    eye: SVGElement;
+export class PlayerPainter {
+    graphics: PlayerGraphics;
 
-    constructor(canvas: PainterCanvas, player: Player) {
-        this.image = new Group();
-        this.image.content(player.skin.image);
+    constructor(container: Container, player: Player) {
+        this.graphics = playerGraphics(player.skin);
+
+        this.graphics.body.addChild(this.graphics.eye);
+        container.addChild(this.graphics.body);
 
         this.update(player);
-
-        this.eye = this.image.element.getElementsByClassName("eye")[0] as SVGElement;
-        this.eye.setAttribute("style", `transition: all 1000ms linear;`);
-
-        canvas.addElement(3, this.image.element);
-        canvas.setInterval(this.moveEye.bind(this), 1000);
     }
 
     update(player: Player) {
-        this.image.position(...player.position);
-        this.image.angle(player.angle);
+        this.graphics.body.position.set(...player.position);
+        this.graphics.body.rotation = player.angle;
     }
 
-    moveEye() {
-        this.eye.setAttribute("transform",
-            `translate(${random(-2, 2)}, ${random(-2, 2)}) rotate(${random(-20, 20)})`
-        );
-    }
+    delete() {}
 }

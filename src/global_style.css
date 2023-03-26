@@ -9,5 +9,5 @@ body {
 
 @font-face {
     font-family: "Montserrat";
-    src: url("$lib/Montserrat.ttf");
+    src: url("$lib/assets/Montserrat.ttf");
 }

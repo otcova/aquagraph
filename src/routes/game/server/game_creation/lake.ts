@@ -2,7 +2,7 @@ import { createNoise2D } from "simplex-noise";
 import alea from "alea";
 import type { Vec2 } from "../../../utils";
 
-export function createRandomBlob(seed: number): Vec2[] {
+export function createRandomBlob(seed: number): Float32Array {
     const random = alea(seed);
     const noise = createNoise2D(random);
 
@@ -15,17 +15,18 @@ export function createRandomBlob(seed: number): Vec2[] {
     const noiseScale = radius * 0.6;
     const noiseSize = radius / 300;
 
-    const verts: Vec2[] = new Array(vertsCount);
+    const verts = new Float32Array(2 * vertsCount);
 
     let angle = 0;
 
-    for (let i = 0; i < vertsCount; ++i) {
+    for (let i = 0; i < verts.length; i += 2) {
         const x = Math.cos(angle);
         const y = Math.sin(angle);
 
         const r = radius + noiseScale * noise(x * noiseSize, y * noiseSize);
 
-        verts[i] = [r * x, r * y];
+        verts[i] = r * x;
+        verts[i + 1] = r * y;
 
         angle += angleStep;
     }
@@ -33,26 +34,35 @@ export function createRandomBlob(seed: number): Vec2[] {
     return smoothSubdividePolygon(verts, 4);
 }
 
-
-export function smoothSubdividePolygon(points: Vec2[], numSubdivisions: number): Vec2[] {
-    const smoothPolyghon: Vec2[]  = [];
+export function smoothSubdividePolygon(vertices: Float32Array, numSubdivisions: number): Float32Array {
+    const smoothPolyghon = new Float32Array(vertices.length * numSubdivisions);
     const step = 1 / numSubdivisions;
 
-    for (let i = 0; i < points.length; ++i) {
-        const p0 = points[i - 1] ?? points[points.length - 1];
-        const p1 = points[i];
-        const p2 = points[(i + 1) % points.length];
-        const p3 = points[(i + 2) % points.length];
-        smoothPolyghon.push(p1);
+    let smoothIndex = 0;
+
+    for (let i = 0; i < vertices.length * 2; i += 2) {
+        const i0 = i == 0 ? vertices.length - 2 : i - 2;
+        const i1 = i;
+        const i2 = (i + 2) % vertices.length;
+        const i3 = (i + 4) % vertices.length;
+
+        const ax = vertices[i0], ay = vertices[i0 + 1];
+        const bx = vertices[i1], by = vertices[i1 + 1];
+        const cx = vertices[i2], cy = vertices[i2 + 1];
+        const dx = vertices[i3], dy = vertices[i3 + 1];
+
+        smoothPolyghon[smoothIndex++] = bx;
+        smoothPolyghon[smoothIndex++] = by;
 
         for (let t = step; t < 1 - Number.EPSILON; t += step) {
             // Catmull–Rom spline
-            smoothPolyghon.push([
-                p1[0] + 0.5 * t * (p2[0] - p0[0] + t * (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0] + t * (3 * (p1[0] - p2[0]) + p3[0] - p0[0]))),
-                p1[1] + 0.5 * t * (p2[1] - p0[1] + t * (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1] + t * (3 * (p1[1] - p2[1]) + p3[1] - p0[1])))
-            ]);
+            smoothPolyghon[smoothIndex++] =
+                bx + 0.5 * t * (cx - ax + t * (2 * ax - 5 * bx + 4 * cx - dx + t * (3 * (bx - cx) + dx - ax)));
+            smoothPolyghon[smoothIndex++] =
+                by + 0.5 * t * (cy - ay + t * (2 * ay - 5 * by + 4 * cy - dy + t * (3 * (by - cy) + dy - ay)));
         }
     }
 
     return smoothPolyghon;
 }
+

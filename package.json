@@ -3,16 +3,18 @@
 	"version": "1.0.0",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev --open --host",
+		"dev": "vite dev --open --host --port 80",
 		"upload": "vite build && gh-pages --dotfiles -d build",
 		"build": "vite build",
 		"preview": "vite preview --open"
 	},
 	"devDependencies": {
+		"@pixi/layers": "^2.0.1",
 		"@sveltejs/adapter-static": "^2.0.0",
 		"@sveltejs/kit": "^1.5.0",
 		"gh-pages": "^5.0.0",
 		"html-minifier": "^4.0.0",
+		"pixi.js": "^7.2.1",
 		"svelte": "^3.54.0",
 		"tslib": "^2.4.1",
 		"typescript": "^4.9.3",
@@ -20,6 +22,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@pixi/lights": "^4.0.0",
 		"alea": "^1.0.1",
 		"simplex-noise": "^4.0.1"
 	}
