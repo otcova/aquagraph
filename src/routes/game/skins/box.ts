@@ -1,10 +1,11 @@
 import { Graphics, type Container } from "pixi.js";
+import { rectHitbox, squareHitbox } from "./hitbox_utils";
 
 export type BoxSkin = { index: number };
 export type BoxGraphics = { body: Container };
 
 const boxSkins = [{
-    hitbox: [],
+    hitbox: squareHitbox(0, 0, 145),
     createGraphics: (): BoxGraphics => {
         const body = new Graphics();
         body.beginFill(0x280b0b);
@@ -19,7 +20,7 @@ const boxSkins = [{
         return { body };
     },
 }, {
-    hitbox: [],
+    hitbox: rectHitbox(0, 0, 275, 145),
     createGraphics: (): BoxGraphics => {
         const body = new Graphics();
         body.beginFill(0x280b0b);

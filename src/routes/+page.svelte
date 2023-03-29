@@ -6,7 +6,7 @@
     let canvasContainer: HTMLElement;
 
     onMount(() => {
-        const server = createGameServer.staticFrame();
+        const server = createGameServer.lobby();
         const painter = new Painter(server, canvasContainer);
     });
 </script>

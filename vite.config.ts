@@ -1,6 +1,11 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import { defineConfig, optimizeDeps } from 'vite';
 
 export default defineConfig({
-	plugins: [sveltekit()]
+    plugins: [sveltekit()],
+    optimizeDeps: {
+        exclude: [
+            "box2d-wasm",
+        ],
+    },
 });

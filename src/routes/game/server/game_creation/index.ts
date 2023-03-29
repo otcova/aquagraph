@@ -2,8 +2,11 @@ import type { GameServer } from "..";
 import type { Box, Game, Lake, Player } from "../..";
 import { playerSkinColors } from "../../skins/player";
 import { createRandomBlob } from "./lake";
+import "../simulator";
+import { Simulator } from "../simulator";
 
-function emptyGame(): Game {
+function randomGame(): Game {
+
     return {
         camera: {
             topLeft: [-500, -300],
@@ -17,6 +20,12 @@ function emptyGame(): Game {
     };
 }
 
+export function lobby(): GameServer {
+    const game = staticFrame().game;
+    const simulator = new Simulator(game);
+    return simulator;
+}
+
 /**
  * Return an offline and static GameServer that will show a single frame
 */
@@ -27,28 +36,28 @@ export function staticFrame(): GameServer {
         position: [0, 0],
         velocity: [0, 0],
         angle: -0.5,
-        angular_velocity: 0,
+        angularVelocity: 0,
     }, {
         user: { name: "B" },
         skin: { index: 0, color: playerSkinColors[3] },
         position: [-150, -100],
         velocity: [0, 0],
         angle: 0,
-        angular_velocity: 0,
+        angularVelocity: 0,
     }, {
         user: { name: "C" },
         skin: { index: 1, color: playerSkinColors[2] },
         position: [-250, -400],
         velocity: [0, 0],
         angle: 2,
-        angular_velocity: 0,
+        angularVelocity: 0,
     }, {
         user: { name: "D" },
         skin: { index: 2, color: playerSkinColors[1] },
         position: [300, 400],
         velocity: [0, 0],
         angle: -1,
-        angular_velocity: 0,
+        angularVelocity: 0,
     }];
 
     const boxes: Box[] = [{

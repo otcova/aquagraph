@@ -10,12 +10,14 @@ export interface Game {
         topLeft: Vec2,
         bottomRight: Vec2,
     },
-    entities: {
-        players: Map<EntityId, Player>,
-        boxes: Map<EntityId, Box>,
-        lakes: Map<EntityId, Lake>,
-    },
+    entities: GameEntities,
 }
+
+export interface GameEntities {
+    players: Map<EntityId, Player>,
+    boxes: Map<EntityId, Box>,
+    lakes: Map<EntityId, Lake>,
+};
 
 export type EntityId = number;
 
@@ -24,7 +26,7 @@ export interface Player {
     position: Vec2,
     velocity: Vec2,
     angle: number,
-    angular_velocity: number,
+    angularVelocity: number,
     skin: PlayerSkin,
 }
 

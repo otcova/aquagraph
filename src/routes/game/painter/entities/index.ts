@@ -25,11 +25,17 @@ export class EntitiesPainter {
             this.players.set(id, painter);
         }
 
+        // Update Players
+        for (const [id, updatedPlayer] of gameDif.entities.players.updated) {
+            this.players.get(id)?.update(updatedPlayer);
+        }
+
         // Create Boxes Painters
         for (const [id, newBox] of gameDif.entities.boxes.added) {
             const painter = new BoxPainter(this.container, newBox);
             this.boxes.set(id, painter);
         }
+
 
         // Delete entities
         for (const entityType of ["players", "boxes", "lakes"] as const) {
