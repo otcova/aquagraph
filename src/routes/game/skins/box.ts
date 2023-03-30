@@ -20,7 +20,7 @@ const boxSkins = [{
         return { body };
     },
 }, {
-    hitbox: rectHitbox(0, 0, 275, 145),
+    hitbox: rectHitbox(0, 0, 305, 145),
     createGraphics: (): BoxGraphics => {
         const body = new Graphics();
         body.beginFill(0x280b0b);

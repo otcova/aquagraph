@@ -2414,7 +2414,7 @@ declare module "box2dweb" {
 			* @param vertexCount The number of vertices, default is 0 and in the box2dweb.js code it is ignored.
 			* @return Convex polygon shape.
 			**/
-			public SetAsVector(vertices: any[], vertexCount?: number): void;
+			public SetAsVector(vertices: ArrayLike<Box2D.Common.Math.b2Vec2>, vertexCount?: number): void;
 
 			/**
 			* Test a point for containment in this shape. This only works for convex shapes.
@@ -3885,7 +3885,7 @@ declare module "box2dweb" {
 			/**
 			* Next contact edge.
 			**/
-			public next: b2ContactEdge;
+			public next: b2ContactEdge | null;
 
 			/**
 			* Contact body.
@@ -3895,7 +3895,7 @@ declare module "box2dweb" {
 			/**
 			* Previous contact edge.
 			**/
-			public prev: b2ContactEdge;
+			public prev: b2ContactEdge | null;
 		}
 	}
 

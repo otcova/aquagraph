@@ -2,6 +2,8 @@ import Box2D from "box2dweb";
 import type { Player, User } from "../../..";
 import { playerHitbox, type PlayerSkin } from "../../../skins/player";
 import { shapeFromVertices } from "../box2d_utils";
+import { BOX_BODY_ID } from "./box";
+import { LAKE_BODY_ID } from "./lake";
 
 export class PlayerSimulator {
     private body: Box2D.Dynamics.b2Body;
@@ -24,12 +26,13 @@ export class PlayerSimulator {
         this.body = world.CreateBody(bodyDef);
 
         const fixtureDef = new Box2D.Dynamics.b2FixtureDef();
-        fixtureDef.shape = shapeFromVertices(playerHitbox(player.skin));
+        fixtureDef.shape = shapeFromVertices(playerHitbox(player.skin).flat());
         fixtureDef.density = .5;
         fixtureDef.friction = 0.2;
         fixtureDef.restitution = 0.6;
 
         this.body.CreateFixture(fixtureDef);
+
     }
 
     delete() {
@@ -37,6 +40,35 @@ export class PlayerSimulator {
     }
 
     step() {
+        let insideLake = false;
+        let touchingBox = false;
+
+        type b2ContactEdge = Box2D.Dynamics.Contacts.b2ContactEdge;
+        let contact: b2ContactEdge | null = this.body.GetContactList();
+        while (contact) {
+            const data = contact.other.GetUserData()
+            if (data == BOX_BODY_ID) touchingBox = true;
+            else if (data == LAKE_BODY_ID) insideLake = true;
+
+            contact = contact.next;
+        }
+
+        if (insideLake) {
+            const gravity = this.world.GetGravity();
+            const f = new Box2D.Common.Math.b2Vec2(gravity.x, gravity.y);
+            f.Multiply(-this.body.GetMass());
+            this.body.ApplyForce(f, this.body.GetWorldCenter());
+
+            const waterFriction = 1;
+            this.body.SetLinearDamping(waterFriction);
+        } else {
+            const airFriction = 0;
+            this.body.SetLinearDamping(airFriction);
+        }
+
+        if (insideLake || touchingBox) {
+            //this.restoreDash();
+        }
     }
 
     recordState(): Player {

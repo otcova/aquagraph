@@ -9,7 +9,7 @@ export class Simulator {
     private entities: EntitiesSimulator;
 
     constructor(public game: Game) {
-        const gravity = new Box2D.Common.Math.b2Vec2(0, 150);
+        const gravity = new Box2D.Common.Math.b2Vec2(0, 300);
         const doSleep = true;
         this.world = new Box2D.Dynamics.b2World(gravity, doSleep);
 
@@ -46,9 +46,13 @@ export class Simulator {
         const velocityIterations = 6;
         const positionIterations = 2;
 
+        // Check contacts
+        this.world.Step(0, 1, 1);
+
         for (let i = 0; i < num_of_steps; ++i) {
             this.entities.step();
             this.world.Step(timeStep, velocityIterations, positionIterations);
+            this.world.ClearForces();
         }
 
         this.game = this.recordGameState();
