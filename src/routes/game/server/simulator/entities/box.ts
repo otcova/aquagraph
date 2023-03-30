@@ -1,7 +1,7 @@
 import Box2D from "box2dweb";
 import type { Box } from "../../..";
 import { boxHitbox } from "../../../skins/box";
-import { shapeFromVertices } from "../box2d_utils";
+import { CATEGORY_BIT, shapeFromVertices } from "../box2d_utils";
 
 export const BOX_BODY_ID = "box";
 
@@ -14,7 +14,14 @@ export class BoxSimulator {
         bodyDef.angle = box.angle;
         bodyDef.userData = BOX_BODY_ID;
         this.body = world.CreateBody(bodyDef);
-        this.body.CreateFixture2(shapeFromVertices(boxHitbox(box.skin).flat()), 0);
+
+        const fixtureDef = new Box2D.Dynamics.b2FixtureDef();
+        fixtureDef.shape = shapeFromVertices(boxHitbox(box.skin).flat());
+        fixtureDef.density = 0;
+        fixtureDef.filter.categoryBits = CATEGORY_BIT.BOX;
+        fixtureDef.filter.maskBits = CATEGORY_BIT.PLAYER;
+        
+        this.body.CreateFixture(fixtureDef);
     }
 
     delete() {

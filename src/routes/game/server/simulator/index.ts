@@ -7,6 +7,7 @@ export class Simulator {
     private lastUpdateTime?: number;
     private world: Box2D.Dynamics.b2World;
     private entities: EntitiesSimulator;
+    private stop = false;
 
     constructor(public game: Game) {
         const gravity = new Box2D.Common.Math.b2Vec2(0, 300);
@@ -32,6 +33,8 @@ export class Simulator {
     }
 
     private run() {
+        if (this.stop) return;
+
         const now = performance.now() / 1000;
         if (this.lastUpdateTime) {
             const deltaTime = now - this.lastUpdateTime;
@@ -40,6 +43,10 @@ export class Simulator {
         }
         this.lastUpdateTime = now;
         requestAnimationFrame(this.run);
+    }
+
+    destroy() {
+        this.stop = true;
     }
 
     private step(num_of_steps: number, timeStep: number) {

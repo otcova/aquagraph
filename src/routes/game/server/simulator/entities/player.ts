@@ -1,7 +1,7 @@
 import Box2D from "box2dweb";
 import type { Player, User } from "../../..";
 import { playerHitbox, type PlayerSkin } from "../../../skins/player";
-import { shapeFromVertices } from "../box2d_utils";
+import { CATEGORY_BIT, shapeFromVertices } from "../box2d_utils";
 import { BOX_BODY_ID } from "./box";
 import { LAKE_BODY_ID } from "./lake";
 
@@ -30,6 +30,7 @@ export class PlayerSimulator {
         fixtureDef.density = .5;
         fixtureDef.friction = 0.2;
         fixtureDef.restitution = 0.6;
+        fixtureDef.filter.categoryBits = CATEGORY_BIT.PLAYER;
 
         this.body.CreateFixture(fixtureDef);
 

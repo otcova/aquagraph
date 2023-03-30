@@ -9,5 +9,6 @@ export * as createGameServer from "./game_creation";
 */
 export interface GameServer {
     game: Game;
+    destroy(): void;
 }
 

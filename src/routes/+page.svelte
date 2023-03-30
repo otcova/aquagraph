@@ -8,6 +8,11 @@
     onMount(() => {
         const server = createGameServer.lobby();
         const painter = new Painter(server, canvasContainer);
+
+        return () => {
+            painter.destroy();
+            server.destroy();
+        };
     });
 </script>
 

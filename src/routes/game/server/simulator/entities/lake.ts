@@ -1,6 +1,6 @@
 import Box2D from "box2dweb";
 import type { Lake } from "../../..";
-import { COLLISION_MASK, shapeFromVertices } from "../box2d_utils";
+import { CATEGORY_BIT, shapeFromVertices } from "../box2d_utils";
 
 export const LAKE_BODY_ID = "lake";
 
@@ -19,7 +19,8 @@ export class LakeSimulator {
         fixtureDef.isSensor = true;
 
         // TODO! Need to see more docs about this
-        fixtureDef.filter.categoryBits = COLLISION_MASK.LAKE;
+        fixtureDef.filter.categoryBits = CATEGORY_BIT.LAKE;
+        fixtureDef.filter.maskBits = CATEGORY_BIT.PLAYER;
 
         this.body.CreateFixture(fixtureDef);
     }

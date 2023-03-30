@@ -54,6 +54,10 @@ export class Painter {
 
         this.entities.animate();
     }
+
+    destroy() {
+        this.app.destroy(true);
+    }
 }
 
 class Camera {

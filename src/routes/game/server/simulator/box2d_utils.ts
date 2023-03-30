@@ -14,6 +14,8 @@ export function shapeFromVertices(vertices: ArrayLike<number>) {
     return polygon
 }
 
-export const COLLISION_MASK = {
-    LAKE: 0b1,
+export const CATEGORY_BIT = {
+    LAKE: 1 << 0,
+    PLAYER: 1 << 1,
+    BOX: 1 << 2,
 } as const;
