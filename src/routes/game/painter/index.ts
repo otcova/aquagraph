@@ -1,12 +1,13 @@
 import { Layer, Stage } from "@pixi/layers";
 import { AmbientLight, diffuseGroup, lightGroup, normalGroup } from "@pixi/lights";
-import { Application, Container } from "pixi.js";
+import { Application, Container, settings } from "pixi.js";
 import type { Game } from "..";
 import type { Vec2 } from "../../utils";
 import { GameDif } from "../dif";
 import type { GameServer } from "../server";
 import { Background } from "./background";
 import { EntitiesPainter } from "./entities";
+import { createLayers } from "./layers";
 
 export class Painter {
     private server: GameServer;
@@ -15,6 +16,7 @@ export class Painter {
     private entities: EntitiesPainter;
     private camera: Camera;
     private background: Background;
+    private pastTime?: number;
 
     constructor(server: GameServer, container: HTMLElement) {
         this.server = server;
@@ -32,6 +34,7 @@ export class Painter {
             new Layer(diffuseGroup),
             new Layer(normalGroup),
             new Layer(lightGroup),
+            ...createLayers(),
             new AmbientLight(0xffffff, 0.1),
         );
 
@@ -43,16 +46,25 @@ export class Painter {
         this.app.ticker.add(this.update.bind(this));
     }
 
-    private update() {
-        if (this.previousGameDrawn != this.server.game) {
-            const gameDif = new GameDif(this.previousGameDrawn, this.server.game);
-            this.previousGameDrawn = this.server.game;
+    private update(deltaTime: number) {
+        const now = performance.now() / 1000;
 
-            this.camera.update(gameDif);
-            this.entities.updateGame(gameDif);
+        if (this.pastTime) {
+            const stepTime = now - this.pastTime;
+
+            if (this.previousGameDrawn != this.server.game) {
+                const gameDif = new GameDif(this.previousGameDrawn, this.server.game);
+                this.previousGameDrawn = this.server.game;
+
+                this.camera.update(gameDif);
+                this.entities.updateGame(gameDif);
+            }
+
+
+            this.entities.animate(stepTime);
         }
 
-        this.entities.animate();
+        this.pastTime = now;
     }
 
     destroy() {

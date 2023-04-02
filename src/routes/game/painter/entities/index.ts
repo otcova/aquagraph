@@ -46,10 +46,10 @@ export class EntitiesPainter {
         }
     }
 
-    animate() {
-        for (const entityType of ["lakes"] as const) {
+    animate(stepTime: number) {
+        for (const entityType of ["players", "lakes"] as const) {
             for (const entity of this[entityType].values()) {
-                entity.animate();
+                entity.animate(stepTime);
             }
         }
     }

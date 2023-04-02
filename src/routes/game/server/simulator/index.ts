@@ -2,6 +2,7 @@ import type { Game } from "../..";
 import Box2D from "box2dweb";
 import { EntitiesSimulator } from "./entities";
 import { GameDif } from "../../dif";
+import { ContactListener } from "./contact_listener";
 
 export class Simulator {
     private lastUpdateTime?: number;
@@ -13,6 +14,7 @@ export class Simulator {
         const gravity = new Box2D.Common.Math.b2Vec2(0, 300);
         const doSleep = true;
         this.world = new Box2D.Dynamics.b2World(gravity, doSleep);
+        this.world.SetContactListener(new ContactListener());
 
         const gameDif = new GameDif(undefined, game);
 
@@ -20,7 +22,7 @@ export class Simulator {
         this.entities.update(gameDif);
 
         this.run = this.run.bind(this);
-        this.run();
+        this.setup();
     }
 
     update(game: Game) {
@@ -30,6 +32,13 @@ export class Simulator {
 
             this.entities.update(gameDif);
         }
+    }
+
+    private setup() {
+        // Check initial contacts
+        this.world.Step(0, 1, 1);
+
+        this.run();
     }
 
     private run() {
@@ -52,9 +61,6 @@ export class Simulator {
     private step(num_of_steps: number, timeStep: number) {
         const velocityIterations = 6;
         const positionIterations = 2;
-
-        // Check contacts
-        this.world.Step(0, 1, 1);
 
         for (let i = 0; i < num_of_steps; ++i) {
             this.entities.step();

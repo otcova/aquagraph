@@ -21,18 +21,19 @@ function randomGame(): Game {
 }
 
 export function lobby(): GameServer {
-    const game = staticFrame().game;
+    const game = staticFrame();
     const simulator = new Simulator(game);
     return simulator;
 }
 
 /**
- * Return an offline and static GameServer that will show a single frame
+ * Return an offline and static Game (will show a single frame)
 */
-export function staticFrame(): GameServer {
+function staticFrame(): Game {
     const players: Player[] = [{
         user: { name: "A" },
         skin: { index: 0, color: playerSkinColors[0] },
+        swimming: false,
         position: [0, 0],
         velocity: [0, 0],
         angle: -0.5,
@@ -40,20 +41,23 @@ export function staticFrame(): GameServer {
     }, {
         user: { name: "B" },
         skin: { index: 0, color: playerSkinColors[3] },
-        position: [-150, -100],
+        swimming: false,
+        position: [-150, -1],
         velocity: [0, 0],
         angle: 0,
         angularVelocity: 0,
     }, {
         user: { name: "C" },
         skin: { index: 1, color: playerSkinColors[2] },
-        position: [-250, -400],
+        swimming: false,
+        position: [-300, -300],
         velocity: [0, 0],
         angle: 2,
         angularVelocity: 0,
     }, {
         user: { name: "D" },
         skin: { index: 2, color: playerSkinColors[1] },
+        swimming: false,
         position: [300, 400],
         velocity: [0, 0],
         angle: -1,
@@ -90,17 +94,15 @@ export function staticFrame(): GameServer {
     }];
 
     return {
-        game: {
-            camera: {
-                topLeft: [-700, -500],
-                bottomRight: [700, 500],
-            },
-            entities: {
-                players: new Map(players.map((v, i) => [i, v])),
-                boxes: new Map(boxes.map((v, i) => [i, v])),
-                lakes: new Map(lakes.map((v, i) => [i, v])),
-            },
-        }
+        camera: {
+            topLeft: [-700, -500],
+            bottomRight: [700, 500],
+        },
+        entities: {
+            players: new Map(players.map((v, i) => [i, v])),
+            boxes: new Map(boxes.map((v, i) => [i, v])),
+            lakes: new Map(lakes.map((v, i) => [i, v])),
+        },
     };
 }
 

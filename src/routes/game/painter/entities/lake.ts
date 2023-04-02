@@ -3,6 +3,7 @@ import type { Lake } from "../..";
 import type { Vec2 } from "../../../utils";
 import { smoothSubdividePolygon } from "../../server/game_creation/lake";
 import { quadOut } from "svelte/easing";
+import { group } from "../layers";
 
 export class LakePainter {
     mesh: Mesh;
@@ -22,7 +23,10 @@ export class LakePainter {
             );
             mesh.tint = 0x008080;
             mesh.position.set(...lake.position);
+            
+            mesh.parentGroup = group.lake;
             container.addChild(mesh);
+
             this.shadows.push(mesh);
         }
 
@@ -35,6 +39,7 @@ export class LakePainter {
         this.mesh.tint = 0x008080;
         this.mesh.position.set(...lake.position);
 
+        this.mesh.parentGroup = group.lake;
         container.addChild(this.mesh);
     }
 

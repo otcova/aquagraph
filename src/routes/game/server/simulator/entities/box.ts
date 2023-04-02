@@ -2,8 +2,7 @@ import Box2D from "box2dweb";
 import type { Box } from "../../..";
 import { boxHitbox } from "../../../skins/box";
 import { CATEGORY_BIT, shapeFromVertices } from "../box2d_utils";
-
-export const BOX_BODY_ID = "box";
+import { UserData } from "../contact_listener";
 
 export class BoxSimulator {
     body: Box2D.Dynamics.b2Body;
@@ -12,7 +11,7 @@ export class BoxSimulator {
         const bodyDef = new Box2D.Dynamics.b2BodyDef();
         bodyDef.position.Set(...box.position);
         bodyDef.angle = box.angle;
-        bodyDef.userData = BOX_BODY_ID;
+        bodyDef.userData = new UserData("box");
         this.body = world.CreateBody(bodyDef);
 
         const fixtureDef = new Box2D.Dynamics.b2FixtureDef();
@@ -20,7 +19,7 @@ export class BoxSimulator {
         fixtureDef.density = 0;
         fixtureDef.filter.categoryBits = CATEGORY_BIT.BOX;
         fixtureDef.filter.maskBits = CATEGORY_BIT.PLAYER;
-        
+
         this.body.CreateFixture(fixtureDef);
     }
 

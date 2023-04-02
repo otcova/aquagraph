@@ -24,6 +24,7 @@ export type EntityId = number;
 export interface Player {
     user: User,
     position: Vec2,
+    swimming: boolean,
     velocity: Vec2,
     angle: number,
     angularVelocity: number,

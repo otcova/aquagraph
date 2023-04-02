@@ -1,8 +1,7 @@
 import Box2D from "box2dweb";
 import type { Lake } from "../../..";
-import { CATEGORY_BIT, shapeFromVertices } from "../box2d_utils";
-
-export const LAKE_BODY_ID = "lake";
+import { CATEGORY_BIT, shapeFromVertices, shapesFromConvexVertices } from "../box2d_utils";
+import { UserData } from "../contact_listener";
 
 export class LakeSimulator {
     body: Box2D.Dynamics.b2Body;
@@ -10,19 +9,21 @@ export class LakeSimulator {
     constructor(private world: Box2D.Dynamics.b2World, private lake: Lake) {
         const bodyDef = new Box2D.Dynamics.b2BodyDef();
         bodyDef.position.Set(...lake.position);
-        bodyDef.userData = LAKE_BODY_ID;
+        bodyDef.userData = new UserData("lake");
         this.body = world.CreateBody(bodyDef);
 
-        const fixtureDef = new Box2D.Dynamics.b2FixtureDef();
-        fixtureDef.shape = shapeFromVertices(lake.vertices);
-        fixtureDef.density = 0;
-        fixtureDef.isSensor = true;
+        for (const shape of shapesFromConvexVertices(lake.vertices)) {
+            const fixtureDef = new Box2D.Dynamics.b2FixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = 0;
+            fixtureDef.isSensor = true;
 
-        // TODO! Need to see more docs about this
-        fixtureDef.filter.categoryBits = CATEGORY_BIT.LAKE;
-        fixtureDef.filter.maskBits = CATEGORY_BIT.PLAYER;
+            // TODO! Need to see more docs about this
+            fixtureDef.filter.categoryBits = CATEGORY_BIT.LAKE;
+            fixtureDef.filter.maskBits = CATEGORY_BIT.PLAYER;
 
-        this.body.CreateFixture(fixtureDef);
+            this.body.CreateFixture(fixtureDef);
+        }
     }
 
     delete() {

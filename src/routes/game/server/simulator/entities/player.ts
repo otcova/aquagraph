@@ -2,13 +2,13 @@ import Box2D from "box2dweb";
 import type { Player, User } from "../../..";
 import { playerHitbox, type PlayerSkin } from "../../../skins/player";
 import { CATEGORY_BIT, shapeFromVertices } from "../box2d_utils";
-import { BOX_BODY_ID } from "./box";
-import { LAKE_BODY_ID } from "./lake";
+import { UserData, type ContactType } from "../contact_listener";
 
 export class PlayerSimulator {
     private body: Box2D.Dynamics.b2Body;
     private skin: PlayerSkin;
     private user: User;
+    private swimming = false;
 
     constructor(private world: Box2D.Dynamics.b2World, player: Player) {
         this.skin = player.skin;
@@ -23,6 +23,10 @@ export class PlayerSimulator {
         bodyDef.angularDamping = 1;
         bodyDef.linearDamping = 0;
         bodyDef.allowSleep = false;
+        bodyDef.userData = new UserData("player", {
+            beginContactType: this.onContactBegin.bind(this),
+            endContactType: this.onContactEnd.bind(this),
+        });
         this.body = world.CreateBody(bodyDef);
 
         const fixtureDef = new Box2D.Dynamics.b2FixtureDef();
@@ -41,34 +45,11 @@ export class PlayerSimulator {
     }
 
     step() {
-        let insideLake = false;
-        let touchingBox = false;
-
-        type b2ContactEdge = Box2D.Dynamics.Contacts.b2ContactEdge;
-        let contact: b2ContactEdge | null = this.body.GetContactList();
-        while (contact) {
-            const data = contact.other.GetUserData()
-            if (data == BOX_BODY_ID) touchingBox = true;
-            else if (data == LAKE_BODY_ID) insideLake = true;
-
-            contact = contact.next;
-        }
-
-        if (insideLake) {
+        if (this.swimming) {
             const gravity = this.world.GetGravity();
             const f = new Box2D.Common.Math.b2Vec2(gravity.x, gravity.y);
             f.Multiply(-this.body.GetMass());
             this.body.ApplyForce(f, this.body.GetWorldCenter());
-
-            const waterFriction = 1;
-            this.body.SetLinearDamping(waterFriction);
-        } else {
-            const airFriction = 0;
-            this.body.SetLinearDamping(airFriction);
-        }
-
-        if (insideLake || touchingBox) {
-            //this.restoreDash();
         }
     }
 
@@ -76,6 +57,7 @@ export class PlayerSimulator {
         const position = this.body.GetPosition();
         const velocity = this.body.GetLinearVelocity();
         return {
+            swimming: this.swimming,
             position: [position.x, position.y],
             velocity: [velocity.x, velocity.y],
             angle: this.body.GetAngle(),
@@ -83,6 +65,24 @@ export class PlayerSimulator {
             skin: this.skin,
             user: this.user,
         };
+    }
+
+    private onContactBegin(type: ContactType) {
+        if (type == "box") {
+            // this.restoreDash()
+        } else if (type == "lake") {
+            this.swimming = true;
+            const waterFriction = 1;
+            this.body.SetLinearDamping(waterFriction);
+        }
+    }
+
+    private onContactEnd(type: ContactType) {
+        if (type == "lake") {
+            this.swimming = false;
+            const airFriction = 0;
+            this.body.SetLinearDamping(airFriction);
+        }
     }
 }
 

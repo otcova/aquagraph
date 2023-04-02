@@ -22,6 +22,7 @@
 	"dependencies": {
 		"@pixi/layers": "^2.0.1",
 		"@pixi/lights": "^4.0.0",
+		"@pixi/particle-emitter": "^5.0.8",
 		"alea": "^1.0.1",
 		"box2dweb": "2.1.0-b",
 		"pixi.js": "^7.2.3",
