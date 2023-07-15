@@ -1,6 +1,6 @@
 import type Box2D from "box2dweb";
-import type { EntityId, GameEntities } from "../../..";
-import type { GameDif } from "../../../dif";
+import type { EntityId, GameEntities, Player } from "../..";
+import type { GameDif } from "../../dif";
 import { BoxSimulator } from "./box";
 import { LakeSimulator } from "./lake";
 import { PlayerSimulator } from "./player";
@@ -17,14 +17,12 @@ export class EntitiesSimulator {
             const painter = new LakeSimulator(this.world, newLake);
             this.lakes.set(id, painter);
         }
-
-        // Create Players
+        
         for (const [id, newPlayer] of gameDif.entities.players.added) {
-            const painter = new PlayerSimulator(this.world, newPlayer);
-            this.players.set(id, painter);
+            this.addPlayer(id, newPlayer);
         }
 
-        console.error("TODO! simulator update player update");
+        //TODO! console.error("TODO! simulator.entities.update player update");
 
         // Create Boxes
         for (const [id, newBox] of gameDif.entities.boxes.added) {
@@ -40,11 +38,16 @@ export class EntitiesSimulator {
             }
         }
     }
+    
+    addPlayer(id: EntityId, newPlayer: Player) {
+        const painter = new PlayerSimulator(this.world, newPlayer);
+        this.players.set(id, painter);
+    }
 
-    step() {
+    step(timeStep: number) {
         for (const entityType of ["players"] as const) {
             for (const entity of this[entityType].values()) {
-                entity.step();
+                entity.step(timeStep);
             }
         }
     }

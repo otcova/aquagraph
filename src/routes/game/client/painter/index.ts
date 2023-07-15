@@ -7,6 +7,7 @@ import { GameDif } from "../../dif";
 import { Background } from "./background";
 import { EntitiesPainter } from "./entities";
 import { createLayers } from "./layers";
+import type { HostConnection } from "../../host";
 
 export class Painter {
     private host: HostConnection;
@@ -45,7 +46,7 @@ export class Painter {
         this.app.ticker.add(this.update.bind(this));
     }
 
-    private update(deltaTime: number) {
+    private update() {
         const now = performance.now() / 1000;
 
         if (this.pastTime) {
@@ -58,6 +59,7 @@ export class Painter {
 
                 this.camera.update(gameDif);
                 this.entities.updateGame(gameDif);
+                for (const effect of gameDif.effects) console.log(effect);
             }
 
 

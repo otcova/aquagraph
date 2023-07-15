@@ -5,6 +5,7 @@ import { Player } from "./player";
 export class Client {
     painter?: Painter;
     player?: Player;
+    playerB?: Player;
 
     constructor(private canvasContainer: HTMLElement) {
     }
@@ -16,9 +17,15 @@ export class Client {
         this.player?.destroy();
         this.player = new Player(host);
     }
+    
+    joinGameB(host: HostConnection) {
+        this.playerB?.destroy();
+        this.playerB = new Player(host, {move: ["arrowup", "arrowleft", "arrowdown", "arrowright"]});
+    }
 
     destroy() {
         this.painter?.destroy();
         this.player?.destroy();
+        this.playerB?.destroy();
     }
 }

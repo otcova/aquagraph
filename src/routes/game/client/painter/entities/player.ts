@@ -52,7 +52,7 @@ const waterParticles: EmitterConfigV3 = ({
     frequency: 1 / 70,
     spawnChance: .2,
     emitterLifetime: 0.31,
-    maxParticles: 1000,
+    maxParticles: 100,
     pos: {
         x: 0,
         y: 0
@@ -82,11 +82,11 @@ const waterParticles: EmitterConfigV3 = ({
                 scale: {
                     list: [
                         {
-                            value: 1,
+                            value: .1,
                             time: 0
                         },
                         {
-                            value: 0.3,
+                            value: 0.03,
                             time: 1
                         }
                     ],
@@ -116,11 +116,11 @@ const waterParticles: EmitterConfigV3 = ({
                 speed: {
                     list: [
                         {
-                            value: 20,
+                            value: 2,
                             time: 0
                         },
                         {
-                            value: 1,
+                            value: .1,
                             time: 1
                         }
                     ],
@@ -132,7 +132,7 @@ const waterParticles: EmitterConfigV3 = ({
             type: 'rotationStatic',
             config: {
                 min: 0,
-                max: 360
+                max: 360,
             }
         },
         {
@@ -142,7 +142,7 @@ const waterParticles: EmitterConfigV3 = ({
                 data: {
                     x: 0,
                     y: 0,
-                    radius: 10
+                    radius: 1
                 }
             }
         },

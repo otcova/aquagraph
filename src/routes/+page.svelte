@@ -12,11 +12,12 @@
 
         const { Host } = await hostModule;
         const host = new Host();
-        client.joinGame(host);
-
+        
+        client.joinGame(host.newPlayer({ name: "A" }));
+        client.joinGameB(host.newPlayer({ name: "B" }));
+        
         return () => {
             client.destroy();
-            host.destroy();
         };
     });
 </script>

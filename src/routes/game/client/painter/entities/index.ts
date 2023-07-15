@@ -35,8 +35,7 @@ export class EntitiesPainter {
             const painter = new BoxPainter(this.container, newBox);
             this.boxes.set(id, painter);
         }
-
-
+        
         // Delete entities
         for (const entityType of ["players", "boxes", "lakes"] as const) {
             for (const id of gameDif.entities[entityType].removed) {

@@ -5,35 +5,35 @@ export type BoxSkin = { index: number };
 export type BoxGraphics = { body: Container };
 
 const boxSkins = [{
-    hitbox: squareHitbox(0, 0, 145),
+    hitbox: squareHitbox(0, 0, 14.5),
     createGraphics: (): BoxGraphics => {
         const body = new Graphics();
         body.beginFill(0x280b0b);
-        body.drawRect(10, 10, 125, 125);
+        body.drawRect(1, 1, 12.5, 12.5);
         body.endFill();
         
         body.beginFill(0x784421);
-        body.drawRoundedRect(0, 0, 65, 65, 9);
-        body.drawRoundedRect(0, 80, 145, 65, 9);
-        body.drawRoundedRect(80, 0, 65, 145, 9);
+        body.drawRoundedRect(0, 0, 6.5, 6.5, .9);
+        body.drawRoundedRect(0, 8, 14.5, 6.5, .9);
+        body.drawRoundedRect(8, 0, 6.5, 14.5, .9);
         body.endFill();
         return { body };
     },
 }, {
-    hitbox: rectHitbox(0, 0, 305, 145),
+    hitbox: rectHitbox(0, 0, 30.5, 14.5),
     createGraphics: (): BoxGraphics => {
         const body = new Graphics();
         body.beginFill(0x280b0b);
-        body.drawRect(10, 10, 245, 125);
+        body.drawRect(1, 1, 24.5, 12.5);
         body.endFill();
         
         body.beginFill(0x784421);
-        body.drawRoundedRect(0, 0, 65, 65, 9);
-        body.drawRoundedRect(80, 0, 145, 65, 9);
-        body.drawRoundedRect(0, 80, 145, 65, 9);
+        body.drawRoundedRect(0, 0, 6.5, 6.5, .9);
+        body.drawRoundedRect(8, 0, 14.5, 6.5, .9);
+        body.drawRoundedRect(0, 8, 14.5, 6.5, .9);
 
-        body.drawRoundedRect(160, 80, 145, 65, 9);
-        body.drawRoundedRect(240, 0, 65, 145, 9);
+        body.drawRoundedRect(16, 8, 14.5, 6.5, .9);
+        body.drawRoundedRect(24, 0, 6.5, 14.5, .9);
         body.endFill();
         return { body };
     },

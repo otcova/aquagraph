@@ -9,11 +9,11 @@ export function createRandomBlob(seed: number): Float32Array {
     const vertsCount = 8;
     const angleStep = 2 * Math.PI / vertsCount;
 
-    let radius = 80 + 200 * random.next();
-    if (radius < 100 && random.next() > 0.5) radius += 120;
+    let radius = 8 + 20 * random.next();
+    if (radius < 10 && random.next() > 0.5) radius += 12;
 
     const noiseScale = radius * 0.6;
-    const noiseSize = radius / 300;
+    const noiseSize = radius / 30;
 
     const verts = new Float32Array(2 * vertsCount);
 

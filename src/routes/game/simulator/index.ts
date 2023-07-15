@@ -7,10 +7,10 @@ import { ContactListener } from "./contact_listener";
 export class Simulator {
     private lastUpdateTime?: number;
     private world: Box2D.Dynamics.b2World;
-    private entities: EntitiesSimulator;
+    entities: EntitiesSimulator;
 
     constructor(public game: Game) {
-        const gravity = new Box2D.Common.Math.b2Vec2(0, 300);
+        const gravity = new Box2D.Common.Math.b2Vec2(0, 100);
         const doSleep = true;
         this.world = new Box2D.Dynamics.b2World(gravity, doSleep);
         this.world.SetContactListener(new ContactListener());
@@ -40,7 +40,10 @@ export class Simulator {
         const now = performance.now() / 1000;
         if (this.lastUpdateTime) {
             const deltaTime = now - this.lastUpdateTime;
-            const stepsPerFrame = 2;
+            
+            // If lowering this, check: https://gamedev.stackexchange.com/questions/194011/what-could-effectively-affect-the-falling-speed-of-a-b2body
+            const stepsPerFrame = 40;
+            
             this.step(stepsPerFrame, deltaTime / stepsPerFrame);
         }
         this.lastUpdateTime = now;
@@ -51,7 +54,7 @@ export class Simulator {
         const positionIterations = 2;
 
         for (let i = 0; i < num_of_steps; ++i) {
-            this.entities.step();
+            this.entities.step(timeStep);
             this.world.Step(timeStep, velocityIterations, positionIterations);
             this.world.ClearForces();
         }
@@ -63,6 +66,7 @@ export class Simulator {
         return {
             camera: this.game.camera,
             entities: this.entities.recordState(),
+            effects: [],
         };
     }
 }

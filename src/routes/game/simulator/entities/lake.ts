@@ -1,7 +1,7 @@
 import Box2D from "box2dweb";
-import type { Lake } from "../../..";
 import { CATEGORY_BIT, shapeFromVertices, shapesFromConvexVertices } from "../box2d_utils";
 import { UserData } from "../contact_listener";
+import type { Lake } from "../..";
 
 export class LakeSimulator {
     body: Box2D.Dynamics.b2Body;
@@ -17,7 +17,7 @@ export class LakeSimulator {
             fixtureDef.shape = shape;
             fixtureDef.density = 0;
             fixtureDef.isSensor = true;
-
+            
             // TODO! Need to see more docs about this
             fixtureDef.filter.categoryBits = CATEGORY_BIT.LAKE;
             fixtureDef.filter.maskBits = CATEGORY_BIT.PLAYER;

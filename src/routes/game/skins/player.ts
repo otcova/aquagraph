@@ -8,16 +8,16 @@ export type PlayerGraphics = { body: Container, eye: Container };
 function eyeGraphics(): Container {
     const eye = new Graphics();
     eye.beginFill(0x000000);
-    eye.drawRect(0, -5.5, 11, 11);
+    eye.drawRect(0, -.55, 1.1, 1.1);
     eye.endFill();
 
     return eye;
 }
 
-const playerHitboxes: Vec2[][] = [
-    [[0, -18], [18, 0], [0, 18], [-18, 0]],//.map(([x,y])=>[x/2,y/2]),
-    [[15, -20], [15, 20], [-20, 0]],
-    [[16, 0], [-5, 21], [-15.5, 10.5], [-5, 0], [-15.5, -10.5], [-5, -21]],
+const playerHitboxes: Vec2[][][] = [
+    [[[0, -1.8], [1.8, 0], [0, 1.8], [-1.8, 0]]],
+    [[[1.5, -2], [1.5, 2], [-2, 0]]],
+    [[[1.6, 0], [-.5, 2.1], [-1.55, 1.05], [-.5, 0]], [[1.6, 0], [-.5, 0], [-1.55, -1.05], [-.5, -2.1]]],
 ];
 
 export const playerSkinColors = [
@@ -27,7 +27,14 @@ export const playerSkinColors = [
     0xd35f8d,
 ];
 
-export function playerHitbox(skin: PlayerSkin): Vec2[] {
+export function randomSkin(): PlayerSkin {
+    return {
+        color: playerSkinColors[Math.floor(Math.random() * playerSkinColors.length)],
+        index: Math.floor(Math.random() * playerHitboxes.length),
+    };
+}
+
+export function playerHitbox(skin: PlayerSkin): Vec2[][] {
     return playerHitboxes[skin.index];
 }
 
@@ -35,9 +42,11 @@ export function playerGraphics(skin: PlayerSkin) {
     const hitbox = playerHitbox(skin);
     const body = new Graphics();
     body.beginFill(skin.color);
-    body.moveTo(...hitbox[0]);
-    for (let i = 1; i < hitbox.length; ++i) {
-        body.lineTo(...hitbox[i]);
+    for (const convexPoly of hitbox) {
+        body.moveTo(...convexPoly[0]);
+        for (let i = 1; i < convexPoly.length; ++i) {
+            body.lineTo(...convexPoly[i]);
+        }
     }
     return { body, eye: eyeGraphics() };
 }

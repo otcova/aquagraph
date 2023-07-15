@@ -1,6 +1,5 @@
 import Box2D from "box2dweb";
 import { utils } from "pixi.js";
-import type { Vec2 } from "../../../utils";
 
 const b2Vec2 = Box2D.Common.Math.b2Vec2;
 
@@ -33,7 +32,6 @@ export function shapeFromVertices(vertices: ArrayLike<number>) {
             vertices[i * 2], vertices[i * 2 + 1]
         );
     }
-
     const polygon = new Box2D.Collision.Shapes.b2PolygonShape();
     polygon.SetAsVector(verts, verts.length);
     return polygon

@@ -1,50 +1,43 @@
-import type { Game, User } from "..";
-import type { PlayerAction } from "../client/player";
-import { gameFrameExample } from "../game_creation";
-import { Simulator } from "../simulator";
-import { Player } from "./player";
+import type { EntityId, Game, User } from "..";
+import type { PlayerInput } from "../client/player";
+import type { Minigame } from "../minigames";
+import { Lobby } from "../minigames/lobby";
+import type { PlayerAction } from "../simulator/entities/player";
+
 
 export class Host {
-
-    private simulator: Simulator;
-    private clients: Channel[] = [];
-
+    private minigame: Minigame;
+    
     constructor() {
-        const game = gameFrameExample();
-        this.simulator = new Simulator(game);
+        this.minigame = new Lobby();
     }
 
-    getGame() {
-        this.simulator.simulate();
-        return this.simulator.game;
+    getGame(): Game {
+        return this.minigame.getGame();
     }
-
-    disconnect(): void {
-        for (const client of this.clients) {
-            client.close();
-        }
-    }
-
-    /// The current game state is sent to the clients
-    private syncClientsGame() {
-        for (const client of this.clients) {
-            client.send(this.simulator.game);
-        }
-    }
-
-    connectClient(clientChannel: Channel) {
-        this.clients.push(clientChannel);
+    
+    newPlayer(user: User): HostConnection {
+        return new LocalHostConnection(this.minigame, user);
     }
 }
 
-class ClientHandle {
-    channel: Channel;
+export interface HostConnection {
+    getGame(): Game;
+    playerInput(input: PlayerInput): void;
 }
 
-interface Channel {
-    send(data: any): void;
-    onReceive?: (message: any) => void;
-    onDisconnect?: () => void;
-    close(): void;
+class LocalHostConnection implements HostConnection {
+    private playerId: EntityId;
+    
+    constructor(private minigame: Minigame, user: User) {
+        this.playerId = this.minigame.spawnPlayer(user);
+    }
+    
+    getGame(): Game {
+        return this.minigame.getGame();
+    }
+    
+    playerInput(input: PlayerInput): void {
+        this.minigame.playerInput(this.playerId, input);
+    }
 }
-
