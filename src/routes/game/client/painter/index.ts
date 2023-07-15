@@ -1,16 +1,15 @@
 import { Layer, Stage } from "@pixi/layers";
 import { AmbientLight, diffuseGroup, lightGroup, normalGroup } from "@pixi/lights";
-import { Application, Container, settings } from "pixi.js";
-import type { Game } from "..";
-import type { Vec2 } from "../../utils";
-import { GameDif } from "../dif";
-import type { GameServer } from "../server";
+import { Application, Container } from "pixi.js";
+import type { Game } from "../..";
+import type { Vec2 } from "../../../utils";
+import { GameDif } from "../../dif";
 import { Background } from "./background";
 import { EntitiesPainter } from "./entities";
 import { createLayers } from "./layers";
 
 export class Painter {
-    private server: GameServer;
+    private host: HostConnection;
     private previousGameDrawn?: Game;
     private app: Application;
     private entities: EntitiesPainter;
@@ -18,8 +17,8 @@ export class Painter {
     private background: Background;
     private pastTime?: number;
 
-    constructor(server: GameServer, container: HTMLElement) {
-        this.server = server;
+    constructor(server: HostConnection, container: HTMLElement) {
+        this.host = server;
 
         this.app = new Application({
             resizeTo: container,
@@ -52,9 +51,10 @@ export class Painter {
         if (this.pastTime) {
             const stepTime = now - this.pastTime;
 
-            if (this.previousGameDrawn != this.server.game) {
-                const gameDif = new GameDif(this.previousGameDrawn, this.server.game);
-                this.previousGameDrawn = this.server.game;
+            const currentGame = this.host.getGame();
+            if (this.previousGameDrawn != currentGame) {
+                const gameDif = new GameDif(this.previousGameDrawn, currentGame);
+                this.previousGameDrawn = currentGame;
 
                 this.camera.update(gameDif);
                 this.entities.updateGame(gameDif);

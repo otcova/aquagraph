@@ -1,14 +1,13 @@
-import type { Game } from "../..";
+import type { Game } from "..";
 import Box2D from "box2dweb";
 import { EntitiesSimulator } from "./entities";
-import { GameDif } from "../../dif";
+import { GameDif } from "../dif";
 import { ContactListener } from "./contact_listener";
 
 export class Simulator {
     private lastUpdateTime?: number;
     private world: Box2D.Dynamics.b2World;
     private entities: EntitiesSimulator;
-    private stop = false;
 
     constructor(public game: Game) {
         const gravity = new Box2D.Common.Math.b2Vec2(0, 300);
@@ -21,29 +20,23 @@ export class Simulator {
         this.entities = new EntitiesSimulator(this.world);
         this.entities.update(gameDif);
 
-        this.run = this.run.bind(this);
-        this.setup();
+        this.simulate = this.simulate.bind(this);
+        // Check initial contacts
+        this.world.Step(0, 1, 1);
     }
 
-    update(game: Game) {
+    updateGame(game: Game) {
         if (this.game != game) {
             const gameDif = new GameDif(this.game, game);
             this.game = game;
+            this.lastUpdateTime = performance.now() / 1000;
 
             this.entities.update(gameDif);
         }
     }
 
-    private setup() {
-        // Check initial contacts
-        this.world.Step(0, 1, 1);
-
-        this.run();
-    }
-
-    private run() {
-        if (this.stop) return;
-
+    // Does the required steps to advance the game
+    simulate() {
         const now = performance.now() / 1000;
         if (this.lastUpdateTime) {
             const deltaTime = now - this.lastUpdateTime;
@@ -51,11 +44,6 @@ export class Simulator {
             this.step(stepsPerFrame, deltaTime / stepsPerFrame);
         }
         this.lastUpdateTime = now;
-        requestAnimationFrame(this.run);
-    }
-
-    destroy() {
-        this.stop = true;
     }
 
     private step(num_of_steps: number, timeStep: number) {

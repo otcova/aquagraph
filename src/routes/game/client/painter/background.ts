@@ -3,7 +3,7 @@ import { Graphics, type Container } from "pixi.js";
 import { createNoise2D } from "simplex-noise";
 
 export class Background {
-    constructor(private container: Container) {
+    constructor(container: Container) {
         const normals = createNormals();
         normals.parentGroup = normalGroup;
         container.addChild(normals);

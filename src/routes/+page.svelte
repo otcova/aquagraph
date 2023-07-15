@@ -1,17 +1,22 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { Painter } from "./game/painter";
-    import { createGameServer } from "./game/server";
 
     let canvasContainer: HTMLElement;
 
-    onMount(() => {
-        const server = createGameServer.lobby();
-        const painter = new Painter(server, canvasContainer);
+    onMount(async () => {
+        const clientModule = import("./game/client");
+        const hostModule = import("./game/host");
+
+        const { Client } = await clientModule;
+        const client = new Client(canvasContainer);
+
+        const { Host } = await hostModule;
+        const host = new Host();
+        client.joinGame(host);
 
         return () => {
-            painter.destroy();
-            server.destroy();
+            client.destroy();
+            host.destroy();
         };
     });
 </script>

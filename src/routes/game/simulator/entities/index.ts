@@ -24,6 +24,8 @@ export class EntitiesSimulator {
             this.players.set(id, painter);
         }
 
+        console.error("TODO! simulator update player update");
+
         // Create Boxes
         for (const [id, newBox] of gameDif.entities.boxes.added) {
             const painter = new BoxSimulator(this.world, newBox);

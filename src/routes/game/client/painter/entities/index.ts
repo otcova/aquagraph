@@ -1,6 +1,6 @@
 import type { Container } from "pixi.js";
-import type { EntityId } from "../..";
-import type { GameDif } from "../../dif";
+import type { EntityId } from "../../..";
+import type { GameDif } from "../../../dif";
 import { BoxPainter } from "./box";
 import { LakePainter } from "./lake";
 import { PlayerPainter } from "./player";

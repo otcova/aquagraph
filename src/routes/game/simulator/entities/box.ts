@@ -1,6 +1,6 @@
 import Box2D from "box2dweb";
-import type { Box } from "../../..";
-import { boxHitbox } from "../../../skins/box";
+import type { Box } from "../..";
+import { boxHitbox } from "../../skins/box";
 import { CATEGORY_BIT, shapeFromVertices } from "../box2d_utils";
 import { UserData } from "../contact_listener";
 

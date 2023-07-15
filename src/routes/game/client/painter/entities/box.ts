@@ -1,6 +1,6 @@
 import type { Container } from "pixi.js";
-import type { Box } from "../..";
-import { boxGraphics, type BoxGraphics } from "../../skins/box";
+import type { Box } from "../../..";
+import { boxGraphics, type BoxGraphics } from "../../../skins/box";
 import { group } from "../layers";
 
 export class BoxPainter {

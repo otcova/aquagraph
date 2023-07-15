@@ -1,6 +1,6 @@
 import { createNoise2D } from "simplex-noise";
 import alea from "alea";
-import type { Vec2 } from "../../../utils";
+import type { Vec2 } from "../../utils";
 
 export function createRandomBlob(seed: number): Float32Array {
     const random = alea(seed);

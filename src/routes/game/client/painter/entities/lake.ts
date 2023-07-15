@@ -1,9 +1,8 @@
 import { DRAW_MODES, Mesh, MeshGeometry, MeshMaterial, Texture, utils, type Container } from "pixi.js";
-import type { Lake } from "../..";
-import type { Vec2 } from "../../../utils";
-import { smoothSubdividePolygon } from "../../server/game_creation/lake";
+import type { Lake } from "../../..";
 import { quadOut } from "svelte/easing";
 import { group } from "../layers";
+import { smoothSubdividePolygon } from "../../../game_creation/lake";
 
 export class LakePainter {
     mesh: Mesh;

@@ -1,35 +1,9 @@
-import type { GameServer } from "..";
-import type { Box, Game, Lake, Player } from "../..";
-import { playerSkinColors } from "../../skins/player";
+import type { Box, Game, Lake, Player } from "..";
+import { playerSkinColors } from "../skins/player";
 import { createRandomBlob } from "./lake";
-import "../simulator";
-import { Simulator } from "../simulator";
 
-function randomGame(): Game {
 
-    return {
-        camera: {
-            topLeft: [-500, -300],
-            bottomRight: [500, 300],
-        },
-        entities: {
-            players: new Map(),
-            boxes: new Map(),
-            lakes: new Map(),
-        },
-    };
-}
-
-export function lobby(): GameServer {
-    const game = staticFrame();
-    const simulator = new Simulator(game);
-    return simulator;
-}
-
-/**
- * Return an offline and static Game (will show a single frame)
-*/
-function staticFrame(): Game {
+export function gameFrameExample(): Game {
     const players: Player[] = [{
         user: { name: "A" },
         skin: { index: 0, color: playerSkinColors[0] },
