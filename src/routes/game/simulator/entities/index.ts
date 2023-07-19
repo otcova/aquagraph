@@ -37,7 +37,7 @@ export class EntitiesSimulator {
         // Delete
         for (const entityType of ["players", "boxes", "lakes"] as const) {
             for (const id of gameDif.entities[entityType].removed) {
-                this[entityType].get(id)?.delete();
+                this[entityType].get(id)?.destroy();
                 this[entityType].delete(id);
             }
         }

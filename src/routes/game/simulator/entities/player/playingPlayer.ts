@@ -1,13 +1,13 @@
 import Box2D from "box2dweb";
-import type { DashEffect, Player, User } from "../..";
-import { playerHitbox } from "../../skins/player";
-import type { PlayerSkin } from "../../skins/player";
-import { CATEGORY_BIT, shapeFromVertices } from "../box2d_utils";
-import { UserData, type ContactType } from "../contact_listener";
-import type { Vec2 } from "../../../utils";
-import type { PlayerInput } from "../../client/player";
+import type { DashEffect, Player, User } from "../../..";
+import { playerHitbox } from "../../../skins/player";
+import type { PlayerSkin } from "../../../skins/player";
+import { CATEGORY_BIT, shapeFromVertices } from "../../box2d_utils";
+import { UserData, type ContactType } from "../../contact_listener";
+import type { Vec2 } from "../../../../utils";
+import type { PlayerInput } from "../../../client/player";
 
-export class PlayerSimulator {
+export class PlayingPlayer {
     private body: Box2D.Dynamics.b2Body;
     private skin: PlayerSkin;
     private user: User;
@@ -19,6 +19,8 @@ export class PlayerSimulator {
     private dashingDirection?: Vec2;
     private dashEffects: DashEffect[];
     private dashCounter = 0;
+
+    private alive = true;
 
     constructor(private world: Box2D.Dynamics.b2World, player: Player) {
         this.skin = player.skin;
@@ -54,11 +56,12 @@ export class PlayerSimulator {
         }
     }
 
-    delete() {
+    destroy() {
         this.world.DestroyBody(this.body);
     }
-
-    step(timeStep: number) {
+    
+    // returns true if alive
+    step(timeStep: number): boolean {
         this.dashEffects = this.dashEffects.filter(effect => {
             effect.timeLeft -= timeStep;
             return effect.timeLeft > 0;
@@ -131,6 +134,8 @@ export class PlayerSimulator {
             }
         }
         this.dashingDelay -= timeStep;
+        
+        return this.alive;
     }
 
     update(player: Player) {
@@ -158,6 +163,7 @@ export class PlayerSimulator {
         const position = this.body.GetPosition();
         const velocity = this.body.GetLinearVelocity();
         return {
+            state: this.alive ? "playing" : "death",
             swimming: this.swimming,
             position: [position.x, position.y],
             velocity: [velocity.x, velocity.y],
@@ -205,7 +211,7 @@ export class PlayerSimulator {
             const waterFriction = 3;
             this.body.SetLinearDamping(waterFriction);
         } else if (type == "screen") {
-            console.log("D");
+            this.alive = false;
         }
     }
     

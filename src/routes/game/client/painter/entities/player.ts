@@ -58,9 +58,11 @@ export class PlayerPainter {
 
     update(player: Player) {
         this.player = player;
+        
         this.graphics.body.position.set(...this.player.position);
         this.graphics.body.rotation = this.player.angle;
-
+        this.graphics.body.visible = player.state == "playing";
+        
         this.waterEmitter.spawnPos.set(...this.player.position);
 
         let newDashCounter = this.dashCounter;
@@ -75,7 +77,7 @@ export class PlayerPainter {
 
     /// deltaTime in seconds
     animate(deltaTime: number) {
-        this.waterEmitter.emit = this.player.swimming;
+        this.waterEmitter.emit = this.player.swimming && this.graphics.body.visible;
         this.waterEmitter.update(deltaTime);
 
         this.dashEmitters = this.dashEmitters.filter(dash => dash.update(this.player, deltaTime));

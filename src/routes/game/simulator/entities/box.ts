@@ -23,7 +23,7 @@ export class BoxSimulator {
         this.body.CreateFixture(fixtureDef);
     }
 
-    delete() {
+    destroy() {
         this.world.DestroyBody(this.body);
     }
 

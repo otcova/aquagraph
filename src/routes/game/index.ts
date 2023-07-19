@@ -30,6 +30,7 @@ export interface Player {
     dashEffects: DashEffect[],
     swimming: boolean,
     dashPower: number,
+    state: "playing" | "death",
 
     position: Vec2,
     velocity: Vec2,

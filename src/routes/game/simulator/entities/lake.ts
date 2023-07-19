@@ -25,7 +25,7 @@ export class LakeSimulator {
         }
     }
 
-    delete() {
+    destroy() {
         this.world.DestroyBody(this.body);
     }
 

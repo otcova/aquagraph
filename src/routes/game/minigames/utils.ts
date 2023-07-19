@@ -4,6 +4,7 @@ import { randomSkin } from "../skins/player";
 export function randomPlayerSpawn(game: Game, user: User): Player {
 	return {
 		user,
+		state: "playing",
 		skin: randomSkin(),
 		swimming: false,
 		position: [20* Math.random()-50, -10],
