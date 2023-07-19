@@ -143,6 +143,7 @@ export class PlayerSimulator {
 
         this.body.SetPosition(new Box2D.Common.Math.b2Vec2(...player.position));
         this.body.SetLinearVelocity(new Box2D.Common.Math.b2Vec2(...player.velocity));
+        this.body.SetAngle(player.angle);
         this.body.SetAngularVelocity(player.angularVelocity);
     }
 
