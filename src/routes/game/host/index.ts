@@ -2,7 +2,6 @@ import type { EntityId, Game, User } from "..";
 import type { PlayerInput } from "../client/player";
 import type { Minigame } from "../minigames";
 import { Lobby } from "../minigames/lobby";
-import type { PlayerAction } from "../simulator/entities/player";
 
 
 export class Host {

@@ -11,20 +11,22 @@ export interface Game {
         bottomRight: Vec2,
     },
     entities: GameEntities,
-    effects: Effect[],
+    time: number,
 }
-
+/*
 export type Effect = DashEffect | DeathFrameEffect;
 
 export interface DashEffect {
     type: "dash",
     pos: Vec2,
+    endTime: number,
 }
 
 export interface DeathFrameEffect {
     type: "deathFrame",
     pos: Vec2,
-}
+    endTime: number,
+}*/
 
 export interface GameEntities {
     players: Map<EntityId, Player>,

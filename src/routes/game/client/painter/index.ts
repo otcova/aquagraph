@@ -59,7 +59,6 @@ export class Painter {
 
                 this.camera.update(gameDif);
                 this.entities.updateGame(gameDif);
-                for (const effect of gameDif.effects) console.log(effect);
             }
 
 

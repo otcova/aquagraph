@@ -57,16 +57,18 @@ export class Simulator {
             this.entities.step(timeStep);
             this.world.Step(timeStep, velocityIterations, positionIterations);
             this.world.ClearForces();
+            
+            this.game.time += timeStep;
         }
 
-        this.game = this.recordGameState();
+        this.recordGameState();
     }
 
-    private recordGameState(): Game {
-        return {
+    private recordGameState() {
+        this.game = {
             camera: this.game.camera,
             entities: this.entities.recordState(),
-            effects: [],
+            time: this.game.time,
         };
     }
 }

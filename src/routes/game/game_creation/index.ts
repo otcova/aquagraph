@@ -77,7 +77,7 @@ export function gameFrameExample(): Game {
             boxes: new Map(boxes.map((v, i) => [i, v])),
             lakes: new Map(lakes.map((v, i) => [i, v])),
         },
-        effects: [],
+        time: 0,
     };
 }
 

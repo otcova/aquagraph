@@ -1,4 +1,4 @@
-import type { Box, Effect, EntityId, Game, Lake, Player } from ".";
+import type { Box, EntityId, Game, Lake, Player } from ".";
 import type { Vec2 } from "../utils";
 
 export class GameDif {
@@ -12,9 +12,6 @@ export class GameDif {
         boxes: MapDif<EntityId, Box>,
         lakes: MapDif<EntityId, Lake>,
     };
-    
-    // All the new effects
-    effects: Effect[] = [];
 
     constructor();
     constructor(past: Game | undefined, current: Game);
@@ -26,8 +23,6 @@ export class GameDif {
                 lakes: new MapDif(),
             };
         } else {
-            this.effects = current.effects;
-            
             this.entities = {
                 players: new MapDif(past?.entities.players, current.entities.players),
                 boxes: new MapDif(past?.entities.boxes, current.entities.boxes),

@@ -53,7 +53,7 @@ export class DashPainter {
 			},
 			"addAtBack": false,
 			"spawnType": "point"
-		});
+		}, []);
 		
 		const particlesContainer = new Container();
         particlesContainer.parentGroup = group.playerParticles;
