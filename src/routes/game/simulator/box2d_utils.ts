@@ -18,7 +18,7 @@ export function shapesFromConvexVertices(vertices: ArrayLike<number>): Box2D.Col
             new b2Vec2(vertices[v0], vertices[v0 + 1]),
             new b2Vec2(vertices[v1], vertices[v1 + 1]),
             new b2Vec2(vertices[v2], vertices[v2 + 1]),
-        ], 3);
+        ]);
     }
 
     return shapes;
@@ -41,4 +41,5 @@ export const CATEGORY_BIT = {
     LAKE: 1 << 0,
     PLAYER: 1 << 1,
     BOX: 1 << 2,
+    SCREEN: 1 << 3,
 } as const;

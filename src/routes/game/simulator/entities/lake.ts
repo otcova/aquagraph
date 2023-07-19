@@ -18,7 +18,6 @@ export class LakeSimulator {
             fixtureDef.density = 0;
             fixtureDef.isSensor = true;
             
-            // TODO! Need to see more docs about this
             fixtureDef.filter.categoryBits = CATEGORY_BIT.LAKE;
             fixtureDef.filter.maskBits = CATEGORY_BIT.PLAYER;
 

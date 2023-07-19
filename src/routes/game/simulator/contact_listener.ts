@@ -1,6 +1,6 @@
 import Box2D from "box2dweb";
 
-export type ContactType = "box" | "lake" | "player";
+export type ContactType = "screen" | "box" | "lake" | "player";
 
 export class UserData {
     beginContactType?: (type: ContactType) => void;

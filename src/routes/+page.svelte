@@ -13,8 +13,8 @@
         const { Host } = await hostModule;
         const host = new Host();
 
-        client.joinGame(host.newPlayer({ name: "A" }));
-        client.joinGameB(host.newPlayer({ name: "B" }));
+        client.joinGame(host.newLaggedPlayer({ name: "A" }));
+        client.joinGameB(host.newLaggedPlayer({ name: "B" }));
 
         return () => {
             client.destroy();

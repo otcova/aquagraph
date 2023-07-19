@@ -3,11 +3,13 @@ import Box2D from "box2dweb";
 import { EntitiesSimulator } from "./entities";
 import { GameDif } from "../dif";
 import { ContactListener } from "./contact_listener";
+import { ScreenCollision } from "./screenCollision";
 
 export class Simulator {
     private lastUpdateTime?: number;
     private world: Box2D.Dynamics.b2World;
     entities: EntitiesSimulator;
+    private screenCollision: ScreenCollision;
 
     constructor(public game: Game) {
         const gravity = new Box2D.Common.Math.b2Vec2(0, 100);
@@ -19,7 +21,10 @@ export class Simulator {
 
         this.entities = new EntitiesSimulator(this.world);
         this.entities.update(gameDif);
-
+        
+        this.screenCollision = new ScreenCollision(this.world);
+        this.screenCollision.update(game.camera);
+        
         this.simulate = this.simulate.bind(this);
         // Check initial contacts
         this.world.Step(0, 1, 1);
@@ -30,7 +35,8 @@ export class Simulator {
             const gameDif = new GameDif(this.game, game);
             this.game = game;
             this.lastUpdateTime = performance.now() / 1000;
-
+            
+            this.screenCollision.update(game.camera);
             this.entities.update(gameDif);
         }
     }

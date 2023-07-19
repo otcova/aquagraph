@@ -18,16 +18,20 @@ export class EntitiesSimulator {
             this.lakes.set(id, painter);
         }
         
-        for (const [id, newPlayer] of gameDif.entities.players.added) {
-            this.addPlayer(id, newPlayer);
-        }
-
-        //TODO! console.error("TODO! simulator.entities.update player update");
-
         // Create Boxes
         for (const [id, newBox] of gameDif.entities.boxes.added) {
             const painter = new BoxSimulator(this.world, newBox);
             this.boxes.set(id, painter);
+        }
+        
+        // Create Players
+        for (const [id, newPlayer] of gameDif.entities.players.added) {
+            this.addPlayer(id, newPlayer);
+        }
+        
+        // Update Players
+        for (const [id, player] of gameDif.entities.players.updated) {
+            this.players.get(id)?.update(player);
         }
 
         // Delete

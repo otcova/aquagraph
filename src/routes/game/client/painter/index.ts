@@ -53,7 +53,7 @@ export class Painter {
             const stepTime = now - this.pastTime;
 
             const currentGame = this.host.getGame();
-            if (this.previousGameDrawn != currentGame) {
+            if (currentGame && this.previousGameDrawn != currentGame) {
                 const gameDif = new GameDif(this.previousGameDrawn, currentGame);
                 this.previousGameDrawn = currentGame;
 

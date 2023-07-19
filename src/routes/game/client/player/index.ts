@@ -29,6 +29,7 @@ export class Player {
     destroy() {
         removeEventListener("keydown", this.updateMovement);
         removeEventListener("keyup", this.updateMovement);
+        this.host.destroy();
     }
 
     private updateMovement() {

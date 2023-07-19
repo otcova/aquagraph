@@ -10,5 +10,8 @@ export function randomPlayerSpawn(game: Game, user: User): Player {
 		velocity: [0, 0],
 		angle: -0.5,
 		angularVelocity: 0,
+		dashPower: 1,
+		dashEffects: [],
+		move: [0, 0],
 	};
 }

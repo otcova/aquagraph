@@ -13,6 +13,10 @@ export class Lobby implements Minigame {
 		this.simulator = new Simulator(gameFrameExample());
 	}
 	
+	syncState(game: Game): void {
+		this.simulator.updateGame(game);
+	}
+	
 	getGame(): Game {
         this.simulator.simulate();
         return this.simulator.game;

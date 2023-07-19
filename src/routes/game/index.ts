@@ -6,27 +6,15 @@ import type { PlayerSkin } from "./skins/player";
  * An instant/fame of a game
 */
 export interface Game {
-    camera: {
-        topLeft: Vec2,
-        bottomRight: Vec2,
-    },
+    camera: Camera,
     entities: GameEntities,
     time: number,
 }
-/*
-export type Effect = DashEffect | DeathFrameEffect;
 
-export interface DashEffect {
-    type: "dash",
-    pos: Vec2,
-    endTime: number,
+export interface Camera {
+    topLeft: Vec2,
+    bottomRight: Vec2,
 }
-
-export interface DeathFrameEffect {
-    type: "deathFrame",
-    pos: Vec2,
-    endTime: number,
-}*/
 
 export interface GameEntities {
     players: Map<EntityId, Player>,
@@ -38,13 +26,29 @@ export type EntityId = number;
 
 export interface Player {
     user: User,
-    position: Vec2,
+    skin: PlayerSkin,
+    dashEffects: DashEffect[],
     swimming: boolean,
+    dashPower: number,
+
+    position: Vec2,
     velocity: Vec2,
     angle: number,
     angularVelocity: number,
-    skin: PlayerSkin,
+    move: Vec2,
 }
+
+export interface DashEffect {
+    pos: Vec2,
+    dir: Vec2,
+    counter: number,
+    timeLeft: number,
+}
+
+// export interface DeathFrameEffect {
+//     pos: Vec2,
+//     endTime: number,
+// }
 
 export interface User {
     name: string,
