@@ -2,7 +2,7 @@ import { Container, Graphics, Rectangle } from "pixi.js";
 import type { Vec2 } from "../../utils";
 
 export type PlayerSkin = { index: number, color: number };
-export type PlayerGraphics = { body: Container, eye: Container };
+export type PlayerGraphics = { normalBody: Container, body: Container, eye: Container };
 
 
 function eyeGraphics(): Container {
@@ -38,7 +38,7 @@ export function playerHitbox(skin: PlayerSkin): Vec2[][] {
     return playerHitboxes[skin.index];
 }
 
-export function playerGraphics(skin: PlayerSkin) {
+export function playerGraphics(skin: PlayerSkin): PlayerGraphics {
     const hitbox = playerHitbox(skin);
     const body = new Graphics();
     body.beginFill(skin.color);
@@ -48,5 +48,13 @@ export function playerGraphics(skin: PlayerSkin) {
             body.lineTo(...convexPoly[i]);
         }
     }
-    return { body, eye: eyeGraphics() };
+    const normalBody = new Graphics();
+    normalBody.beginFill(0x8080ff);
+    for (const convexPoly of hitbox) {
+        normalBody.moveTo(...convexPoly[0]);
+        for (let i = 1; i < convexPoly.length; ++i) {
+            normalBody.lineTo(...convexPoly[i]);
+        }
+    }
+    return { normalBody, body, eye: eyeGraphics() };
 }

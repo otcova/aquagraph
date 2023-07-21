@@ -1,9 +1,9 @@
-import { PointLight } from "@pixi/lights";
-import { Emitter, type EmitterConfigV3, upgradeConfig } from "@pixi/particle-emitter";
+import { PointLight, normalGroup } from "@pixi/lights";
+import { Emitter, type EmitterConfigV3 } from "@pixi/particle-emitter";
 import { Container, Texture } from "pixi.js";
 import type { DashEffect, Player } from "../../..";
 import { playerGraphics, type PlayerGraphics } from "../../../skins/player";
-import { group } from "../layers";
+import { AppContainers } from "../containers";
 import type { Vec2 } from "../../../../utils";
 
 class DashEmitter {
@@ -35,24 +35,20 @@ export class PlayerPainter {
     private waterEmitter: Emitter;
     private dashEmitters: DashEmitter[] = [];
     private dashCounter = -Infinity;
-    particlesContainer: Container;
 
-    constructor(container: Container, private player: Player) {
+    constructor(private container: AppContainers, private player: Player) {
         this.graphics = playerGraphics(player.skin);
-        this.graphics.body.parentGroup = group.player;
-        container.addChild(this.graphics.body);
-
+        
+        container.player.addChild(this.graphics.body);
         this.graphics.body.addChild(this.graphics.eye);
+        
+        this.graphics.body.addChild(this.graphics.normalBody);
+        this.graphics.normalBody.parentGroup = normalGroup;
 
         const light = new PointLight(player.skin.color, 0.7);
         this.graphics.body.addChild(light);
 
-        this.particlesContainer = new Container();
-        this.particlesContainer.parentGroup = group.playerParticles;
-        container.addChild(this.particlesContainer);
-
-        this.waterEmitter = new Emitter(this.particlesContainer, waterParticles);
-
+        this.waterEmitter = new Emitter(container.bottomParticles, waterParticles);
         this.update(player);
     }
 
@@ -69,7 +65,7 @@ export class PlayerPainter {
         for (const dash of player.dashEffects) {
             if (this.dashCounter < dash.counter) {
                 newDashCounter = Math.max(newDashCounter, dash.counter);
-                this.dashEmitters.push(new DashEmitter(player, dash, this.particlesContainer));
+                this.dashEmitters.push(new DashEmitter(player, dash, this.container.topParticles));
             }
         }
         this.dashCounter = newDashCounter;
@@ -83,7 +79,7 @@ export class PlayerPainter {
         this.dashEmitters = this.dashEmitters.filter(dash => dash.update(this.player, deltaTime));
     }
 
-    delete() { }
+    destroy() { }
 }
 
 const waterParticles: EmitterConfigV3 = {

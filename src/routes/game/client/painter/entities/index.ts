@@ -1,6 +1,6 @@
-import type { Container } from "pixi.js";
 import type { EntityId } from "../../..";
 import type { GameDif } from "../../../dif";
+import type { AppContainers } from "../containers";
 import { BoxPainter } from "./box";
 import { LakePainter } from "./lake";
 import { PlayerPainter } from "./player";
@@ -10,7 +10,7 @@ export class EntitiesPainter {
     boxes = new Map<EntityId, BoxPainter>();
     lakes = new Map<EntityId, LakePainter>();
 
-    constructor(private container: Container) { }
+    constructor(private container: AppContainers) { }
 
     updateGame(gameDif: GameDif) {
         // Create Lakes Painters
@@ -39,7 +39,7 @@ export class EntitiesPainter {
         // Delete entities
         for (const entityType of ["players", "boxes", "lakes"] as const) {
             for (const id of gameDif.entities[entityType].removed) {
-                this[entityType].get(id)?.delete();
+                this[entityType].get(id)?.destroy();
                 this[entityType].delete(id);
             }
         }

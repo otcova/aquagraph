@@ -189,9 +189,11 @@ export class PlayingPlayer {
                 this.dashingDelay = 0;
             }
         } else {
-            if (this.dashPower > 0 && !this.swimming
-                && this.move[0] == 0 && this.move[1] == 0
-                && (input.move[0] != 0 || input.move[1] != 0)) {
+            if (this.dashPower > 0 && !this.swimming && (
+                (this.move[0] != input.move[0] && input.move[0] != 0) || 
+                (this.move[1] != input.move[1] && input.move[1] != 0))) {
+                // Dash
+                
                 this.dashingDirection = input.move;
                 --this.dashPower;
 
