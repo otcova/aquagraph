@@ -13,6 +13,7 @@ export function randomPlayerSpawn(game: Game, user: User): Player {
 		angularVelocity: 0,
 		dashPower: 1,
 		dashEffects: [],
+		deathEffects: [],
 		move: [0, 0],
 	};
 }

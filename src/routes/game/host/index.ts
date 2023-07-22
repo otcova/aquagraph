@@ -57,7 +57,7 @@ class LaggedHostConnection implements HostConnection {
     private minigame: Minigame;
     
     constructor(private minigameServer: Minigame, user: User) {
-        this.minigame = new Lobby();
+        this.minigame = new Lobby(this.minigameServer.getGame());
         
         this.playerId = this.minigameServer.spawnPlayer(user);
         this.loopId = window.setInterval(() => {

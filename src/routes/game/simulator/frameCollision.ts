@@ -5,7 +5,7 @@ import type { Camera } from "..";
 
 const size = 100;
 
-export class ScreenCollision {
+export class FrameCollision {
 	private bodies: Box2D.Dynamics.b2Body[] = [];
 
 	constructor(private world: Box2D.Dynamics.b2World) {
@@ -15,16 +15,19 @@ export class ScreenCollision {
 			bodyDef.userData = new UserData("screen");
 
 			const body = world.CreateBody(bodyDef);
-			body.CreateFixture(newScreenFixture());
+			body.CreateFixture(newFrameFixture());
 			this.bodies.push(body);
 		}
 	}
 
 	update(camera: Camera) {
-		this.bodies[0].GetPosition().Set(camera.topLeft[0] - size, 0); // left
-		this.bodies[1].GetPosition().Set(camera.bottomRight[0] + size, 0); // right
-		this.bodies[2].GetPosition().Set(0, camera.topLeft[1] - size); // top
-		this.bodies[3].GetPosition().Set(0, camera.bottomRight[1] + size); // bottom
+		const width = camera.size[0] / 2;
+		const height = camera.size[1] / 2;
+		
+		this.bodies[0].GetPosition().Set(camera.position[0] - width - size, camera.position[1]); // left
+		this.bodies[1].GetPosition().Set(camera.position[0] + width + size, camera.position[1]); // right
+		this.bodies[2].GetPosition().Set(camera.position[0], camera.position[1] - height - size); // top
+		this.bodies[3].GetPosition().Set(camera.position[0], camera.position[1] + height + size); // bottom
 	}
 	
 	destroy() {
@@ -32,7 +35,7 @@ export class ScreenCollision {
 	}
 }
 
-function newScreenFixture(): Box2D.Dynamics.b2FixtureDef {
+function newFrameFixture(): Box2D.Dynamics.b2FixtureDef {
 	const shape = new Box2D.Collision.Shapes.b2PolygonShape()
 	shape.SetAsBox(size, size);
 	

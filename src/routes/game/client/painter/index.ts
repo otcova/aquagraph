@@ -1,25 +1,28 @@
 import { Layer, Stage } from "@pixi/layers";
 import { AmbientLight, diffuseGroup, lightGroup, normalGroup } from "@pixi/lights";
-import { Application, Container, Graphics } from "pixi.js";
-import type { Game } from "../..";
-import { type Vec2 } from "../../../utils";
+import { Application, Container } from "pixi.js";
+import type { Camera, Game } from "../..";
 import { GameDif } from "../../dif";
-import { Background } from "./background";
-import { EntitiesPainter } from "./entities";
 import type { HostConnection } from "../../host";
-import { AppContainers } from "./containers";
+import { Background } from "./background";
+import { CameraFrame } from "./cameraFrame";
+import { EntitiesPainter } from "./entities";
+import { AppLayers } from "./layers";
 
 export class Painter {
     private host: HostConnection;
     private previousGameDrawn?: Game;
-    private app: Application;
     private background: Background;
     private pastTime?: number;
-    private containers: AppContainers;
 
     private entities: EntitiesPainter;
-    private screenFrame: ScreenFrame;
-    private camera: Camera;
+    private cameraFrame: CameraFrame;
+    private camera: CameraContainer;
+
+    diffuseLayer: Layer;
+    app: Application;
+    ambientLightBrightness = 0.4;
+    layers = new AppLayers();
 
     constructor(server: HostConnection, container: HTMLElement) {
         this.host = server;
@@ -34,24 +37,26 @@ export class Painter {
 
         this.app.stage = new Stage();
 
-        const diffuseLayer = new Layer(diffuseGroup);
+        this.diffuseLayer = new Layer(diffuseGroup);
         const normalLayer = new Layer(normalGroup);
         const lightLayer = new Layer(lightGroup);
 
         this.app.stage.addChild(
-            diffuseLayer,
+            this.diffuseLayer,
             normalLayer,
             lightLayer,
-            new AmbientLight(0xffffff, .2),
+            new AmbientLight(0xffffff, this.ambientLightBrightness),
         );
+        
 
-        this.containers = new AppContainers();
-        diffuseLayer.addChild(...this.containers.listAll());
-
-        this.background = new Background(this.containers);
-        this.camera = new Camera(this.app);
-        this.entities = new EntitiesPainter(this.containers);
-        this.screenFrame = new ScreenFrame(this.containers);
+        this.background = new Background(this);
+        this.camera = new CameraContainer(this);
+        this.entities = new EntitiesPainter(this);
+        this.cameraFrame = new CameraFrame(this);
+        
+        this.camera.container.addChild(...this.layers.listCameraLayers());
+        this.diffuseLayer.addChild(...this.layers.listFrameLayers());
+        
 
         container.appendChild(this.app.view as HTMLCanvasElement);
         this.app.ticker.add(this.update.bind(this));
@@ -70,7 +75,7 @@ export class Painter {
 
                 this.camera.update(gameDif);
                 this.background.update(gameDif);
-                this.screenFrame.update(gameDif);
+                this.cameraFrame.update(gameDif);
                 this.entities.updateGame(gameDif);
             }
 
@@ -86,62 +91,36 @@ export class Painter {
     }
 }
 
-class Camera {
-    private topLeft!: Vec2;
-    private bottomRight!: Vec2;
+class CameraContainer {
+    private camera?: Camera;
+    container = new Container();
 
-    constructor(private app: Application) {
-        this.app.renderer.on("resize", this.updateTransform.bind(this));
+    constructor(private painter: Painter) {
+        painter.diffuseLayer.addChild(this.container);
+        this.painter.app.renderer.on("resize", this.update.bind(this));
     }
 
-    update(gameDif: GameDif) {
-        const camera = gameDif.camera;
-        if (camera) {
-            this.topLeft = camera.topLeft;
-            this.bottomRight = camera.bottomRight;
-            this.updateTransform();
-        }
-    }
+    update(gameDif?: GameDif) {
+        if (gameDif && gameDif.camera) this.camera = gameDif.camera;
+        if (this.camera) {
 
-    private updateTransform() {
-        const margin = 0;
-
-        const width = this.bottomRight[0] - this.topLeft[0] + margin * 2;
-        const height = this.bottomRight[1] - this.topLeft[1] + margin * 2;
-
-        const frameWidth = this.app.screen.width;
-        const frameHeight = this.app.screen.height;
-
-        const scale = Math.min(frameWidth / width, frameHeight / height);
-
-        const offsetX = (frameWidth / scale - width) / 2 - this.topLeft[0] + margin;
-        const offsetY = (frameHeight / scale - height) / 2 - this.topLeft[1] + margin;
-
-        this.app.stage.position.set(offsetX * scale, offsetY * scale);
-        this.app.stage.scale.set(scale, scale);
-    }
-}
-
-
-class ScreenFrame {
-    private frame: Graphics;
-
-    constructor(appContainers: AppContainers) {
-        this.frame = new Graphics();
-        appContainers.screenFrame.addChild(this.frame);
-    }
-
-    update(gameDif: GameDif) {
-        const camera = gameDif.camera;
-        if (camera) {
-            const size = 10000;
+            const margin = 1;
             
-            this.frame.clear();
-            this.frame.beginFill(0xFFFFFF);
-            this.frame.drawRect(camera.topLeft[0] - size, camera.topLeft[1], size, size); // left
-            this.frame.drawRect(camera.bottomRight[0], camera.topLeft[1], size, size); // right
-            this.frame.drawRect(camera.topLeft[0] - 100, camera.topLeft[1] - size, size, size); // top
-            this.frame.drawRect(camera.topLeft[0], camera.bottomRight[1], size, size); // bottom
+            const frameWidth = this.painter.app.screen.width;
+            const frameHeight = this.painter.app.screen.height;
+            
+            const uiWidth = 100 + margin * 2;
+            const uiHeight = 100 * this.camera.size[1] / this.camera.size[0] + margin * 2;
+            const uiScale = Math.min(frameWidth / uiWidth, frameHeight / uiHeight);
+            
+            this.painter.app.stage.position.set(frameWidth / 2, frameHeight / 2);
+            this.painter.app.stage.scale.set(uiScale);
+
+            const scale = 100 / this.camera.size[0];
+            this.container.position.set(-this.camera.position[0] * scale, -this.camera.position[1] * scale);
+            this.container.scale.set(scale);
+
+            
         }
     }
 }

@@ -1,34 +1,34 @@
+import { normalGroup } from "@pixi/lights";
 import { Graphics } from "pixi.js";
 import { createNoise2D } from "simplex-noise";
-import type { AppContainers } from "./containers";
+import type { Painter } from ".";
 import type { GameDif } from "../../dif";
-import { normalGroup } from "@pixi/lights";
 
 export class Background {
     private normals: Graphics;
 
-    constructor(container: AppContainers) {
+    constructor(painter: Painter) {
         this.normals = new Graphics();
         this.normals.parentGroup = normalGroup;
         paintNormals(this.normals);
-        container.background.addChild(this.normals);
+        painter.layers.background.addChild(this.normals);
 
         let g = new Graphics();
         g.beginFill(0x222222);
         g.drawRect(-20000, -20000, 40000, 40000);
         g.endFill();
-        container.background.addChild(g);
+        painter.layers.background.addChild(g);
     }
 
     update(gameDif: GameDif) {
         const camera = gameDif.camera;
         if (camera) {
-            const margin = 10;
+            const margin = 50;
         
-            const width = camera.bottomRight[0] - camera.topLeft[0] + margin * 2;
-            const height = camera.bottomRight[1] - camera.topLeft[1] + margin * 2;
+            const width = camera.size[0] + margin * 2;
+            const height = camera.size[1] + margin * 2;
             
-            this.normals.position.set(camera.topLeft[0] - width, camera.topLeft[1] - height);
+            this.normals.position.set(camera.position[0] - width / 2, camera.position[1] - height / 2);
         }
     }
 }
@@ -36,7 +36,7 @@ export class Background {
 const noise = createNoise2D();
 
 function paintNormals(g: Graphics): Graphics {
-    const width = 50;
+    const width = 80;
     const height = 40;
     const space = 10;
 

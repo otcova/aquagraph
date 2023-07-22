@@ -19,23 +19,23 @@
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
      id="namedview7"
-     pagecolor="#000000"
+     pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="1.0"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="false"
+     inkscape:pagecheckerboard="true"
      inkscape:document-units="px"
      showgrid="false"
-     inkscape:zoom="0.70710678"
-     inkscape:cx="1057.1246"
-     inkscape:cy="709.93521"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="690.04783"
+     inkscape:cy="2606.7492"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg5"
+     inkscape:current-layer="layer1"
      inkscape:snap-page="false"
      units="px"
      height="975px"
@@ -211,10 +211,10 @@
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
        id="filter8667"
-       x="-0.043070664"
-       y="-0.052754897"
-       width="1.0861413"
-       height="1.1055098">
+       x="-0.030079819"
+       y="-0.041702678"
+       width="1.0601596"
+       height="1.0834054">
       <feGaussianBlur
          inkscape:collect="always"
          stdDeviation="15.572866"
@@ -319,8 +319,7 @@
      inkscape:label="Game"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:inline"
-     sodipodi:insensitive="true">
+     style="display:inline">
     <path
        style="fill:#672178;stroke:#ff5599;stroke-width:1.5875;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 207.97317,182.19102 65.48025,-46.61769"
@@ -1108,12 +1107,101 @@
        d="m 167.81113,248.69654 c 0.83438,0.98889 0.59401,2.47443 0.13047,3.46333"
        id="path34011"
        sodipodi:nodetypes="cc" />
-    <circle
+    <path
+       style="display:inline;fill:none;stroke:#2b0000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 185.97164,694.38397 -0.0152,1.55868"
+       id="path31623-8"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="C:\Users\Octova\Desktop\Aturat\aquagraph\static\assets\lamp.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400" />
+    <path
+       style="display:inline;fill:none;stroke:#2b0000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 185.99497,696.03638 -0.0152,0.90564"
+       id="path31623-9-0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="C:\Users\Octova\Desktop\Aturat\aquagraph\static\assets\lamp.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400" />
+    <path
+       style="display:inline;fill:none;stroke:#2b0000;stroke-width:0.264583px;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 186.06197,689.59663 0.0109,-11.78772"
+       id="path33356-8"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="C:\Users\Octova\Desktop\Aturat\aquagraph\static\assets\lamp.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400" />
+    <rect
+       style="display:inline;fill:#d4aa00;fill-opacity:1;fill-rule:nonzero;stroke:#280b0b;stroke-width:0.264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal;stop-color:#000000"
+       id="rect31274-9"
+       width="2.6030154"
+       height="1.9546422"
+       x="184.69209"
+       y="689.28851"
+       inkscape:export-filename="C:\Users\Octova\Desktop\Aturat\aquagraph\static\assets\lamp.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400" />
+    <rect
+       style="display:inline;fill:#d4aa00;fill-opacity:1;fill-rule:nonzero;stroke:#280b0b;stroke-width:0.264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal;stop-color:#000000"
+       id="rect31274-6-9"
+       width="2.6030154"
+       height="1.9546422"
+       x="184.69818"
+       y="692.55035"
+       inkscape:export-filename="C:\Users\Octova\Desktop\Aturat\aquagraph\static\assets\lamp.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400" />
+    <ellipse
+       style="display:inline;fill:#aa0000;fill-opacity:1;fill-rule:nonzero;stroke:#280b0b;stroke-width:0.264584;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal;stop-color:#000000"
+       id="path31250-6"
+       cx="186.01292"
+       cy="691.85004"
+       rx="2.6236615"
+       ry="1.7873696"
+       inkscape:export-filename="C:\Users\Octova\Desktop\Aturat\aquagraph\static\assets\lamp.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400" />
+    <ellipse
+       style="display:inline;fill:#aa0000;fill-opacity:1;fill-rule:nonzero;stroke:#280b0b;stroke-width:0.264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal;stop-color:#000000"
+       id="path32418-3"
+       cx="185.98734"
+       cy="696.05963"
+       rx="0.30774641"
+       ry="0.30933484"
+       inkscape:export-filename="C:\Users\Octova\Desktop\Aturat\aquagraph\static\assets\lamp.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400" />
+    <path
+       style="display:inline;fill:#aa0000;stroke:#2b0000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 185.6072,698.49987 c 0,-0.22341 0.0181,-1.23734 0.0181,-1.23734 l 0.38016,-0.32652 0.36206,0.2406 0.0181,1.27171 z"
+       id="path32762-5"
+       sodipodi:nodetypes="cccccc"
+       inkscape:export-filename="C:\Users\Octova\Desktop\Aturat\aquagraph\static\assets\lamp.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400" />
+    <path
+       style="display:inline;fill:none;stroke:#280b0b;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 185.15518,690.11261 c -0.52535,1.14341 -0.59433,1.90195 -0.007,3.41619"
+       id="path34009-8"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="C:\Users\Octova\Desktop\Aturat\aquagraph\static\assets\lamp.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400" />
+    <path
+       style="display:inline;fill:none;stroke:#280b0b;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 186.76556,690.11823 c 0.83438,0.98889 0.59401,2.47443 0.13047,3.46333"
+       id="path34011-0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="C:\Users\Octova\Desktop\Aturat\aquagraph\static\assets\lamp.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400" />
+    <ellipse
        style="mix-blend-mode:lighten;fill:url(#radialGradient30182-5-6-9);fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;paint-order:normal;stop-color:#000000"
        id="path27321-4-1-1"
        cx="165.8096"
        cy="252.7177"
-       r="22.058928" />
+       rx="22.058842"
+       ry="22.058928" />
     <g
        id="g10743"
        transform="matrix(0.7874799,-0.36958822,0.35942301,0.80975142,-99.176686,198.15151)"

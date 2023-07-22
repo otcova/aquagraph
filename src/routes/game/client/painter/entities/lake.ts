@@ -1,16 +1,16 @@
-import { DRAW_MODES, Mesh, MeshGeometry, MeshMaterial, Texture, utils, type Container } from "pixi.js";
-import type { Lake } from "../../..";
-import { quadOut } from "svelte/easing";
-import { AppContainers } from "../containers";
-import { smoothSubdividePolygon } from "../../../game_creation/lake";
 import { normalGroup } from "@pixi/lights";
+import { DRAW_MODES, Mesh, MeshGeometry, MeshMaterial, Texture, utils } from "pixi.js";
+import { quadOut } from "svelte/easing";
+import type { Painter } from "..";
+import type { Lake } from "../../..";
+import { smoothSubdividePolygon } from "../../../game_creation/lake";
 
 export class LakePainter {
     mesh: Mesh;
     shadows: Mesh[] = [];
     normalShadows: Mesh[] = [];
 
-    constructor(container: AppContainers, lake: Lake) {
+    constructor(painter: Painter, lake: Lake) {
         const vertices = smoothSubdividePolygon(lake.vertices, 8);
         const indices = new Int16Array(utils.earcut(vertices));
         const geometry = new MeshGeometry(vertices, undefined, indices);
@@ -25,7 +25,7 @@ export class LakePainter {
             mesh.tint = 0x008080;
             mesh.position.set(...lake.position);
             
-            container.lake.addChild(mesh);
+            painter.layers.lake.addChild(mesh);
 
             this.shadows.push(mesh);
         }
@@ -38,7 +38,7 @@ export class LakePainter {
         );
         this.mesh.tint = 0x008080;
         this.mesh.position.set(...lake.position);
-        container.lake.addChild(this.mesh);
+        painter.layers.lake.addChild(this.mesh);
         
 
         for (let i = 0; i < 3; ++i) {
@@ -78,7 +78,7 @@ export class LakePainter {
             const color = Math.round(0x80 * 0.9 * (1 - t));
             this.shadows[i].tint = (color << 8) + color;
             this.shadows[i].alpha = quadOut(1 - t);
-            this.normalShadows[i].alpha = quadOut(1 - t);
+            this.normalShadows[i].alpha = Math.min(1, quadOut(1 - t) * 2);
         }
     }
 

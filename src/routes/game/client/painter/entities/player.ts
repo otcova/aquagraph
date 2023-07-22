@@ -1,10 +1,10 @@
 import { PointLight, normalGroup } from "@pixi/lights";
 import { Emitter, type EmitterConfigV3 } from "@pixi/particle-emitter";
 import { Container, Texture } from "pixi.js";
+import type { Painter } from "..";
 import type { DashEffect, Player } from "../../..";
-import { playerGraphics, type PlayerGraphics } from "../../../skins/player";
-import { AppContainers } from "../containers";
 import type { Vec2 } from "../../../../utils";
+import { playerGraphics, type PlayerGraphics } from "../../../skins/player";
 
 class DashEmitter {
     private emitters: Emitter[];
@@ -36,19 +36,19 @@ export class PlayerPainter {
     private dashEmitters: DashEmitter[] = [];
     private dashCounter = -Infinity;
 
-    constructor(private container: AppContainers, private player: Player) {
+    constructor(private painter: Painter, private player: Player) {
         this.graphics = playerGraphics(player.skin);
         
-        container.player.addChild(this.graphics.body);
+        painter.layers.player.addChild(this.graphics.body);
         this.graphics.body.addChild(this.graphics.eye);
         
         this.graphics.body.addChild(this.graphics.normalBody);
         this.graphics.normalBody.parentGroup = normalGroup;
 
-        const light = new PointLight(player.skin.color, 0.7);
+        const light = new PointLight(player.skin.color, 1 - painter.ambientLightBrightness);
         this.graphics.body.addChild(light);
 
-        this.waterEmitter = new Emitter(container.bottomParticles, waterParticles);
+        this.waterEmitter = new Emitter(painter.layers.bottomParticles, waterParticles);
         this.update(player);
     }
 
@@ -65,7 +65,7 @@ export class PlayerPainter {
         for (const dash of player.dashEffects) {
             if (this.dashCounter < dash.counter) {
                 newDashCounter = Math.max(newDashCounter, dash.counter);
-                this.dashEmitters.push(new DashEmitter(player, dash, this.container.topParticles));
+                this.dashEmitters.push(new DashEmitter(player, dash, this.painter.layers.topParticles));
             }
         }
         this.dashCounter = newDashCounter;

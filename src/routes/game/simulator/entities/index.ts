@@ -2,6 +2,7 @@ import type Box2D from "box2dweb";
 import type { EntityId, GameEntities, Player } from "../..";
 import type { GameDif } from "../../dif";
 import { BoxSimulator } from "./box";
+import { FrameBoxSimulator } from "./frameBox";
 import { LakeSimulator } from "./lake";
 import { PlayerSimulator } from "./player";
 
@@ -9,32 +10,41 @@ export class EntitiesSimulator {
     players = new Map<EntityId, PlayerSimulator>();
     boxes = new Map<EntityId, BoxSimulator>();
     lakes = new Map<EntityId, LakeSimulator>();
+    frameBoxes = new Map<EntityId, FrameBoxSimulator>();
 
     constructor(private world: Box2D.Dynamics.b2World) { }
     update(gameDif: GameDif) {
-        // Create Lakes
+        // Create Entities ------------------
         for (const [id, newLake] of gameDif.entities.lakes.added) {
             const painter = new LakeSimulator(this.world, newLake);
             this.lakes.set(id, painter);
         }
         
-        // Create Boxes
         for (const [id, newBox] of gameDif.entities.boxes.added) {
-            const painter = new BoxSimulator(this.world, newBox);
-            this.boxes.set(id, painter);
+            const box = new BoxSimulator(this.world, newBox);
+            this.boxes.set(id, box);
         }
         
-        // Create Players
         for (const [id, newPlayer] of gameDif.entities.players.added) {
             this.addPlayer(id, newPlayer);
         }
         
-        // Update Players
+        for (const [id, newBox] of gameDif.entities.frameBoxes.added) {
+            const box = new FrameBoxSimulator(this.world, newBox);
+            this.frameBoxes.set(id, box);
+        }
+        
+        // Update Players --------------------
+        
         for (const [id, player] of gameDif.entities.players.updated) {
             this.players.get(id)?.update(player);
         }
+        
+        if (gameDif.camera) {
+            for (const [_, box] of this.frameBoxes) box.update(gameDif.camera);
+        }
 
-        // Delete
+        // Delete Entities --------------------
         for (const entityType of ["players", "boxes", "lakes"] as const) {
             for (const id of gameDif.entities[entityType].removed) {
                 this[entityType].get(id)?.destroy();
@@ -61,6 +71,7 @@ export class EntitiesSimulator {
             players: mapKeys(this.players, player => player.recordState()),
             boxes: mapKeys(this.boxes, box => box.recordState()),
             lakes: mapKeys(this.lakes, lake => lake.recordState()),
+            frameBoxes: mapKeys(this.frameBoxes, box => box.recordState()),
         };
     }
 }

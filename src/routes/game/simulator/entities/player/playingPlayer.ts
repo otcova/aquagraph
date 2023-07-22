@@ -1,5 +1,5 @@
 import Box2D from "box2dweb";
-import type { DashEffect, Player, User } from "../../..";
+import type { DashEffect, DeathEffect, Player, User } from "../../..";
 import { playerHitbox } from "../../../skins/player";
 import type { PlayerSkin } from "../../../skins/player";
 import { CATEGORY_BIT, shapeFromVertices } from "../../box2d_utils";
@@ -18,7 +18,8 @@ export class PlayingPlayer {
     private dashingDelay = 0;
     private dashingDirection?: Vec2;
     private dashEffects: DashEffect[];
-    private dashCounter = 0;
+    private deathEffects: DeathEffect[];
+    private effectCounter = 0;
 
     private alive = true;
 
@@ -28,6 +29,7 @@ export class PlayingPlayer {
         this.swimming = player.swimming;
         this.dashPower = player.dashPower;
         this.dashEffects = player.dashEffects;
+        this.deathEffects = player.deathEffects;
 
         const bodyDef = new Box2D.Dynamics.b2BodyDef();
         bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
@@ -35,7 +37,7 @@ export class PlayingPlayer {
         bodyDef.linearVelocity.Set(...player.velocity);
         bodyDef.angle = player.angle;
         bodyDef.angularVelocity = player.angularVelocity;
-        bodyDef.angularDamping = 1;
+        bodyDef.angularDamping = 0.8;
         bodyDef.linearDamping = 0.;
         bodyDef.allowSleep = false;
         bodyDef.userData = new UserData("player", {
@@ -66,6 +68,10 @@ export class PlayingPlayer {
             effect.timeLeft -= timeStep;
             return effect.timeLeft > 0;
         });
+        this.deathEffects = this.deathEffects.filter(effect => {
+            effect.timeLeft -= timeStep;
+            return effect.timeLeft > 0;
+        });
 
         if (this.dashingDirection && this.dashingDelay <= 0) {
             const pos = this.body.GetWorldCenter();
@@ -87,8 +93,8 @@ export class PlayingPlayer {
             dashDir.Normalize();
             
             this.dashEffects.push({
-                counter: ++this.dashCounter,
-                pos: [pos.x, pos.y],
+                counter: ++this.effectCounter,
+                position: [pos.x, pos.y],
                 dir: [dashDir.x, dashDir.y],
                 timeLeft: 1,
             });
@@ -144,6 +150,7 @@ export class PlayingPlayer {
         this.swimming = player.swimming;
         this.dashPower = player.dashPower;
         this.dashEffects = player.dashEffects;
+        this.deathEffects = player.deathEffects;
         this.move = player.move;
 
         this.body.SetPosition(new Box2D.Common.Math.b2Vec2(...player.position));
@@ -173,6 +180,7 @@ export class PlayingPlayer {
             user: this.user,
             dashPower: this.dashPower,
             dashEffects: this.dashEffects,
+            deathEffects: this.deathEffects,
             move: this.move,
         };
     }
@@ -212,8 +220,14 @@ export class PlayingPlayer {
             this.swimming = true;
             const waterFriction = 3;
             this.body.SetLinearDamping(waterFriction);
-        } else if (type == "screen") {
+        } else if (type == "screen" || type == "frameBox") {
             this.alive = false;
+            const pos = this.body.GetWorldCenter();
+            this.deathEffects.push({
+                counter: ++this.effectCounter,
+                position: [pos.x, pos.y],
+                timeLeft: 1,
+            });
         }
     }
     
