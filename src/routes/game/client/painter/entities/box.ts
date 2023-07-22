@@ -25,6 +25,12 @@ export class BoxPainter {
         this.container.addChild(this.graphics.diffuse);
         this.container.addChild(this.graphics.normal);
     }
+    
+    animate(deltaTime: number) {
+        for (const lamp of this.lamps) {
+            lamp.animate(deltaTime);
+        }
+    }
 
     destroy() {
         this.container.destroy();
@@ -41,7 +47,7 @@ class Lamp {
     light: PointLight;
 
     constructor(painter: Painter, parent: Container, box: Box, pos: Vec2) {
-        this.light = new PointLight(0xffffff, 1 - painter.ambientLightBrightness);
+        this.light = new PointLight(0xaa4203 , 1.5 - painter.ambientLightBrightness);
         
         parent.addChild(this.container);
         this.container.addChild(this.img);
@@ -59,7 +65,12 @@ class Lamp {
         this.imgNormal.parentGroup = normalGroup;
         this.light.position.set(0, 240);
     }
-
+    
+    animate(deltaTime: number) {
+        this.light.brightness += (0.5 - Math.random()) * Math.min(0.5, deltaTime) * 4;
+        this.light.brightness = Math.max(0.1, Math.min(3, this.light.brightness));
+    }
+    
     destroy() {
         this.container.destroy();
         this.img.destroy();

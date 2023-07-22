@@ -51,7 +51,7 @@ export class EntitiesPainter {
     }
 
     animate(stepTime: number) {
-        for (const entityType of ["players", "lakes"] as const) {
+        for (const entityType of ["players", "lakes", "boxes"] as const) {
             for (const entity of this[entityType].values()) {
                 entity.animate(stepTime);
             }
