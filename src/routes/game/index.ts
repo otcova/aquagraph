@@ -4,9 +4,10 @@ import type { PlayerSkin } from "./skins/player";
 
 
 export interface Game {
+    time: number,
     camera: Camera,
     entities: GameEntities,
-    time: number,
+    light: number,
 }
 
 export interface Camera {
@@ -74,4 +75,3 @@ export interface Lake {
     position: Vec2,
     vertices: Float32Array,
 }
-

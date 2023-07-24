@@ -3,14 +3,14 @@ import { AmbientLight, diffuseGroup, lightGroup, normalGroup } from "@pixi/light
 import { Application, Container } from "pixi.js";
 import type { Camera, Game } from "../..";
 import { GameDif } from "../../dif";
-import type { HostConnection } from "../../host";
+import type { Minigame } from "../../minigames";
 import { Background } from "./background";
 import { CameraFrame } from "./cameraFrame";
 import { EntitiesPainter } from "./entities";
 import { AppLayers } from "./layers";
 
 export class Painter {
-    private host: HostConnection;
+    private host: Minigame;
     private previousGameDrawn?: Game;
     private background: Background;
     private pastTime?: number;
@@ -19,13 +19,14 @@ export class Painter {
     private cameraFrame: CameraFrame;
     private camera: CameraContainer;
 
-    diffuseLayer: Layer;
+    sceneLight = new AmbientLight(0xffffff, 0);
+
+    diffuseLayer = new Layer(diffuseGroup);
     app: Application;
-    ambientLightBrightness = 0.4;
     layers = new AppLayers();
 
-    constructor(server: HostConnection, container: HTMLElement) {
-        this.host = server;
+    constructor(minigame: Minigame, container: HTMLElement) {
+        this.host = minigame;
 
         this.app = new Application({
             resizeTo: container,
@@ -37,7 +38,6 @@ export class Painter {
 
         this.app.stage = new Stage();
 
-        this.diffuseLayer = new Layer(diffuseGroup);
         const normalLayer = new Layer(normalGroup);
         const lightLayer = new Layer(lightGroup);
 
@@ -45,18 +45,18 @@ export class Painter {
             this.diffuseLayer,
             normalLayer,
             lightLayer,
-            new AmbientLight(0xffffff, this.ambientLightBrightness),
+            this.sceneLight,
         );
-        
+
 
         this.background = new Background(this);
         this.camera = new CameraContainer(this);
         this.entities = new EntitiesPainter(this);
         this.cameraFrame = new CameraFrame(this);
-        
+
         this.camera.container.addChild(...this.layers.listCameraLayers());
         this.diffuseLayer.addChild(...this.layers.listFrameLayers());
-        
+
 
         container.appendChild(this.app.view as HTMLCanvasElement);
         this.app.ticker.add(this.update.bind(this));
@@ -73,7 +73,8 @@ export class Painter {
                 const gameDif = new GameDif(this.previousGameDrawn, currentGame);
                 this.previousGameDrawn = currentGame;
 
-                this.camera.update(gameDif);
+                if (gameDif.light) this.sceneLight.brightness = gameDif.light;
+                if (gameDif.camera) this.camera.update(gameDif);
                 this.background.update(gameDif);
                 this.cameraFrame.update(gameDif);
                 this.entities.updateGame(gameDif);
@@ -105,22 +106,33 @@ class CameraContainer {
         if (this.camera) {
 
             const margin = 1;
-            
-            const frameWidth = this.painter.app.screen.width;
-            const frameHeight = this.painter.app.screen.height;
-            
+
+            let frameWidth = this.painter.app.screen.width;
+            let frameHeight = this.painter.app.screen.height;
+
+            // Check if it needs a 90 degre rotation
+            if (frameWidth < frameHeight) {
+                this.painter.app.stage.rotation = Math.PI / 2;
+                [frameWidth, frameHeight] = [frameHeight, frameWidth];
+            } else {
+                this.painter.app.stage.rotation = 0;
+            }
+
             const uiWidth = 100 + margin * 2;
             const uiHeight = 100 * this.camera.size[1] / this.camera.size[0] + margin * 2;
             const uiScale = Math.min(frameWidth / uiWidth, frameHeight / uiHeight);
-            
-            this.painter.app.stage.position.set(frameWidth / 2, frameHeight / 2);
+
+            this.painter.app.stage.position.set(
+                this.painter.app.screen.width / 2,
+                this.painter.app.screen.height / 2
+            );
             this.painter.app.stage.scale.set(uiScale);
 
             const scale = 100 / this.camera.size[0];
             this.container.position.set(-this.camera.position[0] * scale, -this.camera.position[1] * scale);
             this.container.scale.set(scale);
 
-            
+
         }
     }
 }

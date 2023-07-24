@@ -1,4 +1,3 @@
-import { diffuseGroup } from "@pixi/lights";
 import { Container } from "pixi.js";
 
 export class AppLayers {
@@ -12,6 +11,8 @@ export class AppLayers {
 
     frame = new Container();
     topFrame = new Container();
+    
+    ui = new Container();
 
     // Layers that are relative to the camera position.
     listCameraLayers(): Container[] {
@@ -23,19 +24,16 @@ export class AppLayers {
             this.player,
             this.box,
             this.topParticles,
-            
-            // this.frame,
-            // this.topFrame,
         ];
     }
 
     // Layers that are not relative to the camera position.
     listFrameLayers(): Container[] {
-        // this.frame.parentGroup = diffuseGroup;
-        // this.topFrame.parentGroup = diffuseGroup;
         return [
             this.frame,
             this.topFrame,
+            
+            this.ui,
         ];
     }
 }

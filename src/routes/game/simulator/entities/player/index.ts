@@ -1,7 +1,7 @@
 import type Box2D from "box2dweb";
 import type { Player } from "../../..";
 import { PlayingPlayer } from "./playingPlayer";
-import type { PlayerInput } from "../../../client/player";
+import type { PlayerInput } from "../../../client/playerInput";
 
 export class PlayerSimulator {
 
@@ -14,15 +14,15 @@ export class PlayerSimulator {
 	}
 
 	update(player: Player) {
-		if (this.pastPlayer.state != player.state) {
+		if (player.state == "playing") {
+			if (!this.playingPlayer) {
+				this.playingPlayer = new PlayingPlayer(this.world, player);
+			} else {
+				this.playingPlayer.update(player);
+			}
+		} else if (player.state == "death") {
 			this.playingPlayer?.destroy();
 			this.playingPlayer = undefined;
-
-			if (this.pastPlayer.state == "death") {
-				this.playingPlayer = new PlayingPlayer(this.world, player);
-			}
-		} else if (this.pastPlayer.state == "playing" && this.playingPlayer) {
-			this.playingPlayer.update(player);
 		}
 		this.pastPlayer = player;
 	}

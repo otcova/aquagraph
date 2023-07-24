@@ -1,31 +1,27 @@
-import type { HostConnection } from "../host";
+import type { User } from "..";
+import { type Minigame } from "../minigames";
+import { LobbyHost } from "../minigames/lobby";
+import { RaceMinigameHost } from "../minigames/race";
 import { Painter } from "./painter";
-import { Player } from "./player";
+import { PlayerIn } from "./playerInput";
+
 
 export class Client {
-    painter?: Painter;
-    player?: Player;
-    playerB?: Player;
-
-    constructor(private canvasContainer: HTMLElement) {
-    }
-
-    joinGame(host: HostConnection) {
-        this.painter?.destroy();
-        this.painter = new Painter(host, this.canvasContainer);
-
-        this.player?.destroy();
-        this.player = new Player(host);
-    }
+    painter: Painter;
+    player: PlayerIn;
     
-    joinGameB(host: HostConnection) {
-        this.playerB?.destroy();
-        this.playerB = new Player(host, {move: ["arrowup", "arrowleft", "arrowdown", "arrowright"]});
+    minigame: Minigame;
+
+    constructor(canvasContainer: HTMLElement, user: User) {
+        this.minigame = new LobbyHost(user);
+        this.painter = new Painter(this.minigame, canvasContainer);
+        this.player = new PlayerIn(this.minigame);
     }
 
     destroy() {
-        this.painter?.destroy();
-        this.player?.destroy();
-        this.playerB?.destroy();
+        this.minigame.destroy();
+        this.painter.destroy();
+        this.player.destroy();
     }
 }
+

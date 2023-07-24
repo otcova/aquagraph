@@ -32,24 +32,26 @@ class DashEmitter {
 
 export class PlayerPainter {
     private graphics: PlayerGraphics;
+    private light: PointLight;
     private waterEmitter: Emitter;
     private dashEmitters: DashEmitter[] = [];
     private dashCounter = -Infinity;
 
     constructor(private painter: Painter, private player: Player) {
         this.graphics = playerGraphics(player.skin);
-        
+
         painter.layers.player.addChild(this.graphics.body);
         this.graphics.body.addChild(this.graphics.eye);
-        
+
         this.graphics.body.addChild(this.graphics.normalBody);
         this.graphics.normalBody.parentGroup = normalGroup;
 
-        const light = new PointLight(player.skin.color, 1 - painter.ambientLightBrightness);
-        this.graphics.body.addChild(light);
+        this.light = new PointLight(player.skin.color, 0);
+        this.graphics.body.addChild(this.light);
 
         this.waterEmitter = new Emitter(painter.layers.bottomParticles, waterParticles);
         this.update(player);
+        this.updateLight(painter.sceneLight.brightness);
     }
 
     update(player: Player) {
@@ -58,7 +60,7 @@ export class PlayerPainter {
         this.graphics.body.position.set(...this.player.position);
         this.graphics.body.rotation = this.player.angle;
         this.graphics.body.visible = player.state == "playing";
-        
+
         this.waterEmitter.spawnPos.set(...this.player.position);
 
         let newDashCounter = this.dashCounter;
@@ -69,6 +71,10 @@ export class PlayerPainter {
             }
         }
         this.dashCounter = newDashCounter;
+    }
+    
+    updateLight(light: number) {
+        this.light.brightness = 0.6 * (1 - light);
     }
 
     /// deltaTime in seconds
@@ -194,11 +200,11 @@ const waterParticles: EmitterConfigV3 = {
 function dashParticlesConfig(player: Player, dir: Vec2): EmitterConfigV3[] {
     const angle = Math.atan2(-dir[1], -dir[0]) * 180 / Math.PI;
     const playerColor = player.skin.color.toString(16);
-    
+
     let color = {
         list: [
             {
-                value: playerColor == "2fcbff"? "3fcbff" : "2fcbff",
+                value: playerColor == "2fcbff" ? "3fcbff" : "2fcbff",
                 time: 0
             },
             {
@@ -207,7 +213,7 @@ function dashParticlesConfig(player: Player, dir: Vec2): EmitterConfigV3[] {
             }
         ],
     };
-    
+
     return [{
         lifetime: {
             min: 0.5,

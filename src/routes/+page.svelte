@@ -5,17 +5,10 @@
 
     onMount(async () => {
         const clientModule = import("./game/client");
-        const hostModule = import("./game/host");
-
+        
         const { Client } = await clientModule;
-        const client = new Client(canvasContainer);
-
-        const { Host } = await hostModule;
-        const host = new Host();
-
-        client.joinGame(host.newLaggedPlayer({ name: "A" }));
-        client.joinGameB(host.newLaggedPlayer({ name: "B" }));
-
+        const client = new Client(canvasContainer, { name: "A" });
+        
         return () => {
             client.destroy();
         };

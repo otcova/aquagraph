@@ -5,7 +5,7 @@ import type { PlayerSkin } from "../../../skins/player";
 import { CATEGORY_BIT, shapeFromVertices } from "../../box2d_utils";
 import { UserData, type ContactType } from "../../contact_listener";
 import type { Vec2 } from "../../../../utils";
-import type { PlayerInput } from "../../../client/player";
+import type { PlayerInput } from "../../../client/playerInput";
 
 export class PlayingPlayer {
     private body: Box2D.Dynamics.b2Body;
@@ -30,6 +30,10 @@ export class PlayingPlayer {
         this.dashPower = player.dashPower;
         this.dashEffects = player.dashEffects;
         this.deathEffects = player.deathEffects;
+        
+        for (const effect of [...this.dashEffects, ...this.deathEffects]) {
+            if (effect.counter > this.effectCounter) this.effectCounter = effect.counter + 10; 
+        }
 
         const bodyDef = new Box2D.Dynamics.b2BodyDef();
         bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
@@ -61,7 +65,7 @@ export class PlayingPlayer {
     destroy() {
         this.world.DestroyBody(this.body);
     }
-    
+
     // returns true if alive
     step(timeStep: number): boolean {
         this.dashEffects = this.dashEffects.filter(effect => {
@@ -75,7 +79,7 @@ export class PlayingPlayer {
 
         if (this.dashingDirection && this.dashingDelay <= 0) {
             const pos = this.body.GetWorldCenter();
-            
+
             const dashForce = 200;
 
             const f = new Box2D.Common.Math.b2Vec2(
@@ -87,18 +91,18 @@ export class PlayingPlayer {
             f.y *= 1.3;
 
             this.body.ApplyImpulse(f, pos);
-            
+
             const dashDir = this.body.GetLinearVelocity().Copy();
             dashDir.Add(f);
             dashDir.Normalize();
-            
+
             this.dashEffects.push({
                 counter: ++this.effectCounter,
                 position: [pos.x, pos.y],
                 dir: [dashDir.x, dashDir.y],
                 timeLeft: 1,
             });
-            
+
             this.dashingDirection = undefined;
         }
         else if (this.swimming) {
@@ -140,7 +144,7 @@ export class PlayingPlayer {
             }
         }
         this.dashingDelay -= timeStep;
-        
+
         return this.alive;
     }
 
@@ -152,6 +156,7 @@ export class PlayingPlayer {
         this.dashEffects = player.dashEffects;
         this.deathEffects = player.deathEffects;
         this.move = player.move;
+        this.alive = player.state == "playing";
 
         this.body.SetPosition(new Box2D.Common.Math.b2Vec2(...player.position));
         this.body.SetLinearVelocity(new Box2D.Common.Math.b2Vec2(...player.velocity));
@@ -198,10 +203,10 @@ export class PlayingPlayer {
             }
         } else {
             if (this.dashPower > 0 && !this.swimming && (
-                (this.move[0] != input.move[0] && input.move[0] != 0) || 
+                (this.move[0] != input.move[0] && input.move[0] != 0) ||
                 (this.move[1] != input.move[1] && input.move[1] != 0))) {
                 // Dash
-                
+
                 this.dashingDirection = input.move;
                 --this.dashPower;
 
@@ -230,7 +235,7 @@ export class PlayingPlayer {
             });
         }
     }
-    
+
     private onContactEnd(type: ContactType) {
         if (type == "lake") {
             this.swimming = false;

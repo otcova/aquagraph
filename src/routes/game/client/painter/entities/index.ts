@@ -36,9 +36,24 @@ export class EntitiesPainter {
             this.frameBoxes.set(id, painter);
         }
 
-        // Update Players
+        // Update Painters ---------------
         for (const [id, updatedPlayer] of gameDif.entities.players.updated) {
             this.players.get(id)?.update(updatedPlayer);
+        }
+        
+        if (gameDif.light !== undefined) {
+            for (const entityType of ["players", "boxes"] as const) {
+                for (const entity of this[entityType].values()) {
+                    entity.updateLight(gameDif.light);
+                }
+            }
+        }
+        
+        for (const entityType of ["players", "boxes"] as const) {
+            for (const id of gameDif.entities[entityType].removed) {
+                this[entityType].get(id)?.destroy();
+                this[entityType].delete(id);
+            }
         }
 
         // Delete Painters ------------------

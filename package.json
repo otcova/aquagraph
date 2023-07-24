@@ -26,6 +26,7 @@
 		"@pixi/particle-emitter": "^5.0.8",
 		"alea": "^1.0.1",
 		"box2dweb": "2.1.0-b",
+		"peerjs": "^1.4.7",
 		"pixi.js": "^7.2.3",
 		"simplex-noise": "^4.0.1"
 	}

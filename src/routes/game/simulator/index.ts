@@ -43,7 +43,7 @@ export class Simulator {
     }
 
     updateGameDif(gameDif: GameDif) {
-        gameDif.apply(this.game);
+        this.game = gameDif.apply(this.game);
         
         if (gameDif.camera) this.frameCollision.update(gameDif.camera);
         this.entities.update(gameDif);
@@ -81,9 +81,13 @@ export class Simulator {
 
     private recordGameState() {
         this.game = {
-            camera: this.game.camera,
+            camera: {
+                position: [...this.game.camera.position],
+                size: [...this.game.camera.size],
+            },
             entities: this.entities.recordState(),
             time: this.game.time,
+            light: this.game.light,
         };
     }
 }

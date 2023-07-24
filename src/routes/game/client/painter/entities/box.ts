@@ -1,7 +1,7 @@
 import { normalGroup, PointLight } from "@pixi/lights";
 import { Container, Sprite } from "pixi.js";
 import type { Painter } from "..";
-import type { Box } from "../../..";
+import type { Box, Game } from "../../..";
 import type { Vec2 } from "../../../../utils";
 import { boxGraphics, type BoxGraphics } from "../../../skins/box";
 
@@ -13,10 +13,10 @@ export class BoxPainter {
     constructor(painter: Painter, box: Box) {
         this.container.position.set(...box.position);
         this.container.rotation = box.angle;
-        
+
         this.graphics = boxGraphics(box.skin);
-        this.graphics.normal.parentGroup = normalGroup;        
-        
+        this.graphics.normal.parentGroup = normalGroup;
+
         for (const lampPos of box.lamps || []) {
             this.lamps.push(new Lamp(painter, this.container, box, lampPos));
         }
@@ -24,8 +24,16 @@ export class BoxPainter {
         painter.layers.box.addChild(this.container);
         this.container.addChild(this.graphics.diffuse);
         this.container.addChild(this.graphics.normal);
+        
+        this.updateLight(painter.sceneLight.brightness);
     }
-    
+
+    updateLight(light: number) {
+        for (const lamp of this.lamps) {
+            lamp.setBrightness(2 * (1 - light));
+        }
+    }
+
     animate(deltaTime: number) {
         for (const lamp of this.lamps) {
             lamp.animate(deltaTime);
@@ -46,9 +54,11 @@ class Lamp {
     imgNormal = Sprite.from('assets/lampNorm.png');
     light: PointLight;
 
+    brightnessTarget = 1;
+
     constructor(painter: Painter, parent: Container, box: Box, pos: Vec2) {
-        this.light = new PointLight(0xaa4203 , 1.5 - painter.ambientLightBrightness);
-        
+        this.light = new PointLight(0xaa4203, this.brightnessTarget);
+
         parent.addChild(this.container);
         this.container.addChild(this.img);
         this.container.addChild(this.imgNormal);
@@ -65,12 +75,20 @@ class Lamp {
         this.imgNormal.parentGroup = normalGroup;
         this.light.position.set(0, 240);
     }
-    
+
     animate(deltaTime: number) {
         this.light.brightness += (0.5 - Math.random()) * Math.min(0.5, deltaTime) * 4;
-        this.light.brightness = Math.max(0.1, Math.min(3, this.light.brightness));
+        this.light.brightness = Math.max(
+            this.brightnessTarget / 2, 
+            Math.min(this.brightnessTarget * 2, this.light.brightness)
+        );
     }
-    
+
+    setBrightness(brightness: number) {
+        this.light.brightness = brightness;
+        this.brightnessTarget = brightness;
+    }
+
     destroy() {
         this.container.destroy();
         this.img.destroy();

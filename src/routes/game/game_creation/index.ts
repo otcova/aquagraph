@@ -1,5 +1,5 @@
 import type { Box, Camera, FrameBox, Game, Lake, Player } from "..";
-import type { Vec2 } from "../../utils";
+import { randomRange, type Vec2 } from "../../utils";
 import { createRandomBlob } from "./lake";
 
 export function gameFrameExample(): Game {
@@ -83,6 +83,7 @@ export function gameFrameExample(): Game {
             frameBoxes: new Map(frameBoxes.map((v, i) => [i, v])),
         },
         time: 0,
+        light: 0.4,
     };
 }
 
@@ -126,7 +127,7 @@ function createFrameBoxesLine(start: Vec2, dir: Vec2, len: number, list: FrameBo
         
         list.push({
             position: [start[0] + dir[0] * i - dir[1] * offset, start[1] + dir[1] * i + dir[0] * offset],
-            color: 0x4D2B15,
+            color: 0x432612,
             size: [boxSize + Math.abs(dir[1]) * config.long, boxSize + Math.abs(dir[0]) * config.long],
         });
         
@@ -134,6 +135,3 @@ function createFrameBoxesLine(start: Vec2, dir: Vec2, len: number, list: FrameBo
     }
 }
 
-function randomRange(min: number, max: number) {
-    return Math.random() * (max - min) + min;
-}

@@ -11,7 +11,8 @@ export class GameDif {
         frameBoxes: MapDif<EntityId, FrameBox>,
     };
     
-    deltaTime = 0;
+    light?: number;
+    time?: number;
 
     constructor();
     constructor(past: Game | undefined, current: Game);
@@ -31,7 +32,8 @@ export class GameDif {
                 frameBoxes: new MapDif(past?.entities.frameBoxes, current.entities.frameBoxes),
             };
             
-            this.deltaTime = current.time - (past?.time ?? current.time);
+            if (past?.time != current.time) this.time = current.time;
+            if (past?.light != current.light) this.light = current.light;
 
             if (JSON.stringify(past?.camera) != JSON.stringify(current.camera)) {
                 this.camera = current.camera;
@@ -39,13 +41,20 @@ export class GameDif {
         }
     }
     
-    apply(game: Game) {
-        if (this.camera) game.camera = this.camera;
-        this.entities.players.apply(game.entities.players);
-        this.entities.boxes.apply(game.entities.boxes);
-        this.entities.lakes.apply(game.entities.lakes);
-        this.entities.frameBoxes.apply(game.entities.frameBoxes);
-        game.time += this.deltaTime;
+    apply(game: Game): Game {
+        const newGame: Game = {
+            camera: this.camera ?? game.camera,
+            entities: game.entities,
+            time: this.time ?? game.time,
+            light: this.light ?? game.light,
+        };
+        
+        this.entities.players.apply(newGame.entities.players);
+        this.entities.boxes.apply(newGame.entities.boxes);
+        this.entities.lakes.apply(newGame.entities.lakes);
+        this.entities.frameBoxes.apply(newGame.entities.frameBoxes);
+        
+        return newGame;
     }
 }
 
