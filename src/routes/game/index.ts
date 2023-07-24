@@ -43,13 +43,15 @@ export interface Player {
 
 export interface DashEffect {
     position: Vec2,
-    dir: Vec2,
+    direction: Vec2,
     counter: number,
     timeLeft: number,
 }
 
 export interface DeathEffect {
     position: Vec2,
+    angle: number,
+    force: number,
     counter: number,
     timeLeft: number,
 }

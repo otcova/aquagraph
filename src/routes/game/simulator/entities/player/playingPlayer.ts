@@ -99,7 +99,7 @@ export class PlayingPlayer {
             this.dashEffects.push({
                 counter: ++this.effectCounter,
                 position: [pos.x, pos.y],
-                dir: [dashDir.x, dashDir.y],
+                direction: [dashDir.x, dashDir.y],
                 timeLeft: 1,
             });
 
@@ -228,9 +228,13 @@ export class PlayingPlayer {
         } else if (type == "screen" || type == "frameBox") {
             this.alive = false;
             const pos = this.body.GetWorldCenter();
+            const dir = this.body.GetLinearVelocity();
+            
             this.deathEffects.push({
                 counter: ++this.effectCounter,
                 position: [pos.x, pos.y],
+                angle: Math.atan2(-dir.y, -dir.x),
+                force: Math.hypot(dir.y, dir.x),
                 timeLeft: 1,
             });
         }
