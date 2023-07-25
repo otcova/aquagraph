@@ -79,23 +79,25 @@ export class PlayingPlayer {
 
         if (this.dashingDirection && this.dashingDelay <= 0) {
             const pos = this.body.GetWorldCenter();
-
+            const dashDir = this.body.GetLinearVelocity().Copy();
+            
+            
             const dashForce = 200;
 
             const f = new Box2D.Common.Math.b2Vec2(
                 this.dashingDirection[0],
                 this.dashingDirection[1],
             );
+            
             f.Normalize();
             f.Multiply(dashForce);
-            f.y *= 1.3;
-
+            if (dashDir.y > 0 && this.dashingDirection[1] < 0) f.y -= dashDir.y * 3;
+            
             this.body.ApplyImpulse(f, pos);
 
-            const dashDir = this.body.GetLinearVelocity().Copy();
             dashDir.Add(f);
             dashDir.Normalize();
-
+                
             this.dashEffects.push({
                 counter: ++this.effectCounter,
                 position: [pos.x, pos.y],

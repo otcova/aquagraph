@@ -61,7 +61,11 @@ export class NetworkHost {
 	}
 
 	static createParty(): Promise<NetworkHost> {
-		const peer = new Peer();
+		let id;
+		while (!id || id.includes("O") || id.includes("0"))
+			id = Math.floor(Math.random() * (36**4)).toString(36).toUpperCase();
+		
+		const peer = new Peer(id);
 		return new Promise((resolve, error) => {
 			peer.on("open", () => resolve(new NetworkHost(peer)));
 			peer.on("error", (...args) => error(args));

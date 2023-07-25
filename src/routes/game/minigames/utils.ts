@@ -7,7 +7,7 @@ export function randomPlayerSpawn(game: Game, user: User): Player {
 		state: "playing",
 		skin: randomSkin(),
 		swimming: false,
-		position: [20* Math.random()-50, -10],
+		position: [20 * Math.random() - 50, -10],
 		velocity: [0, 0],
 		angle: -0.5,
 		angularVelocity: 0,

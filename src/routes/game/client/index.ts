@@ -1,7 +1,6 @@
 import type { User } from "..";
 import { type Minigame } from "../minigames";
-import { LobbyHost } from "../minigames/lobby";
-import { RaceMinigameHost } from "../minigames/race";
+import { Lobby } from "../minigames/lobby";
 import { Painter } from "./painter";
 import { PlayerIn } from "./playerInput";
 
@@ -9,12 +8,14 @@ import { PlayerIn } from "./playerInput";
 export class Client {
     painter: Painter;
     player: PlayerIn;
-    
+
     minigame: Minigame;
 
     constructor(canvasContainer: HTMLElement, user: User) {
-        this.minigame = new LobbyHost(user);
-        this.painter = new Painter(this.minigame, canvasContainer);
+        this.painter = new Painter(canvasContainer);
+        this.minigame = new Lobby(user, this.painter.ui);
+        
+        this.painter.start(this.minigame);
         this.player = new PlayerIn(this.minigame);
     }
 
