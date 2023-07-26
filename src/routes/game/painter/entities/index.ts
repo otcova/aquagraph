@@ -1,12 +1,13 @@
 import type { Painter } from "..";
-import type { EntityId } from "../../..";
-import type { GameDif } from "../../../dif";
+import type { EntityId } from "../..";
+import type { GameDif } from "../../dif";
 import { BoxPainter } from "./box";
 import { FrameBoxPainter } from "./frameBox";
 import { LakePainter } from "./lake";
 import { PlayerPainter } from "./player";
 
-export class EntitiesPainter {
+export class 
+EntitiesPainter {
     players = new Map<EntityId, PlayerPainter>();
     boxes = new Map<EntityId, BoxPainter>();
     lakes = new Map<EntityId, LakePainter>();
@@ -62,6 +63,15 @@ export class EntitiesPainter {
                 this[entityType].get(id)?.destroy();
                 this[entityType].delete(id);
             }
+        }
+    }
+    
+    clear() {
+        for (const entityType of ["players", "boxes", "lakes", "frameBoxes"] as const) {
+            for (const entity of this[entityType].values()) {
+                entity.destroy();
+            }
+            this[entityType].clear();
         }
     }
 

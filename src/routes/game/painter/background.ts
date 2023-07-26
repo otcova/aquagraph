@@ -2,7 +2,7 @@ import { normalGroup } from "@pixi/lights";
 import { Graphics } from "pixi.js";
 import { createNoise2D } from "simplex-noise";
 import type { Painter } from ".";
-import type { GameDif } from "../../dif";
+import type { GameDif } from "../dif";
 
 export class Background {
     private normals: Graphics;

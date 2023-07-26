@@ -1,10 +1,11 @@
 import { normalGroup } from "@pixi/lights";
 import { Graphics, Sprite } from "pixi.js";
 import type { Painter } from ".";
-import type { GameDif } from "../../dif";
+import type { GameDif } from "../dif";
 import { loadTexture } from "./textures";
+import blurTextureURL from "$lib/assets/blur.png";
 
-const blurTexture = loadTexture("assets/blur.png");
+const blurTexture = loadTexture(blurTextureURL);
 
 export class CameraFrame {
     private frame = new Graphics();

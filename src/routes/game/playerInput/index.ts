@@ -1,5 +1,5 @@
-import type { Vec2 } from "../../../utils";
-import type { Minigame } from "../../minigames";
+import type { Vec2 } from "../../utils";
+import type { MinigameManager } from "../minigame";
 import { keyboard } from "./keyboard";
 
 export interface Controls {
@@ -19,7 +19,7 @@ export interface PlayerInput {
 export class PlayerIn {
     private pastDirection?: Vec2;
 
-    constructor(private host: Minigame, private controls = deafultControls()) {
+    constructor(private host: MinigameManager, private controls = deafultControls()) {
         this.updateMovement = this.updateMovement.bind(this);
 
         addEventListener("keydown", this.updateMovement);
@@ -30,7 +30,6 @@ export class PlayerIn {
     destroy() {
         removeEventListener("keydown", this.updateMovement);
         removeEventListener("keyup", this.updateMovement);
-        this.host.destroy();
     }
 
     private updateMovement(event?: KeyboardEvent) {

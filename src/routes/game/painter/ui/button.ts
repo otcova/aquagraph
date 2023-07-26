@@ -1,6 +1,6 @@
 import { BitmapFont, BitmapText, Container, Graphics } from "pixi.js";
 import type { Painter } from "..";
-import type { Vec2 } from "../../../../utils";
+import type { Vec2 } from "../../../utils";
 import { font } from "../textures";
 
 export class UIButton {
@@ -59,7 +59,6 @@ export class UIButton {
 				fontSize: this.hy * 1.2,
 				fontName: bitmapFont.font,
 			});
-			this.bitmapText.tint = 0xffffff;
 			
 			this.container.addChild(this.bitmapText);
 		} else {

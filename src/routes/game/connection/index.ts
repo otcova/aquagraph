@@ -1,6 +1,6 @@
 import type { Game, User } from "..";
-import type { PlayerInput } from "../client/playerInput";
 import { GameDif } from "../dif";
+import type { PlayerInput } from "../playerInput";
 import { Simulator } from "../simulator";
 import { NetworkDataChannel, NetworkGuest, NetworkHost } from "./network";
 
@@ -28,7 +28,6 @@ export class HostConnection {
 			if (!this.net) {
 				this.net = net;
 				this.net.handleGuest = this.handleGuest.bind(this);
-				// TODO! Handle guest leave
 
 				if (!this.reportIntervalId) {
 					const reportRate = 30;
@@ -38,14 +37,14 @@ export class HostConnection {
 				net.destroy();
 			}
 		}
-		
+
 		return this.net.getPartyId() ?? "ERROR";
 	}
-	
+
 	getPartyId(): string | undefined {
 		return this.net?.getPartyId();
 	}
-	
+
 	private async handleGuest(guest: NetworkDataChannel) {
 		if (!this.handleNewPlayer) throw Error("No handelNewPlayer");
 
@@ -58,6 +57,12 @@ export class HostConnection {
 			const message = rawMessage as GuestMessage;
 			playerInputHandle(message.input);
 		});
+
+		guest.onClose = () => {
+			const dif = new GameDif();
+			dif.entities.players.removed.push(guestId);
+			this.simulator.updateGameDif(dif);
+		};
 
 		guest.send({ game: this.guestsGame, id: guestId } as FirstHostMessage);
 		this.guests.set(guestId, guest);
@@ -88,12 +93,14 @@ export class GuestConnection {
 
 	private game: Game;
 	simulator: Simulator;
+	onClose?: () => void;
 
 	private constructor(public net: NetworkGuest, firstMessage: FirstHostMessage) {
 		this.game = firstMessage.game;
 		this.simulator = new Simulator(this.game);
 
 		net.handleMessages(this.handleMessage.bind(this));
+		net.onClose = () => this.onClose?.();
 	}
 
 	static async joinParty(partyId: string, user: User): Promise<GuestConnection> {
@@ -105,8 +112,15 @@ export class GuestConnection {
 
 	private handleMessage(rawMessage: any) {
 		const message = rawMessage as HostMessage;
-		this.game = message.gameDif.apply(this.game);
-		this.simulator.updateGame(this.game);
+		if (message.gameDif) {
+			const gameDif = Object.assign(Object.create(GameDif.prototype), message.gameDif);
+			this.game = gameDif.apply(this.game);
+			this.simulator.updateGame(this.game);
+		} else if (message.game) {
+			this.game = message.game;
+			this.simulator = new Simulator(this.game);
+			// TODO! this.painter.startTransition();
+		}
 	}
 
 	destroy(): void {
@@ -119,7 +133,7 @@ export class GuestConnection {
 	}
 
 	sendPlayerInput(input: PlayerInput): void {
-		this.net.send({ input });
+		this.net.send({ input } as GuestMessage);
 	}
 }
 
@@ -130,7 +144,8 @@ interface FirstHostMessage {
 
 // Message send by the host
 interface HostMessage {
-	gameDif: GameDif;
+	gameDif?: GameDif;
+	game?: Game;
 }
 
 // Message send by the guest

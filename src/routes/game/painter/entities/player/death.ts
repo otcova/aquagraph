@@ -1,6 +1,6 @@
 import { type EmitterConfigV3 } from "@pixi/particle-emitter";
 import { Texture } from "pixi.js";
-import type { DeathEffect, Player } from "../../../..";
+import type { DeathEffect, Player } from "../../..";
 
 
 export function deathParticlesConfig(player: Player, death: DeathEffect): EmitterConfigV3[] {

@@ -1,6 +1,6 @@
 import { type EmitterConfigV3 } from "@pixi/particle-emitter";
 import { Texture } from "pixi.js";
-import type { DashEffect, Player } from "../../../..";
+import type { DashEffect, Player } from "../../..";
 
 
 export function dashParticlesConfig(player: Player, dash: DashEffect): EmitterConfigV3[] {

@@ -4,10 +4,10 @@
     let canvasContainer: HTMLElement;
 
     onMount(async () => {
-        const clientModule = import("./game/client");
+        const clientModule = import("./game/minigame");
         
-        const { Client } = await clientModule;
-        const client = new Client(canvasContainer, { name: "A" });
+        const { MinigameManager } = await clientModule;
+        const client = new MinigameManager(canvasContainer, { name: "A" });
         
         return () => {
             client.destroy();
@@ -27,12 +27,6 @@
         margin: 0;
         background: #000;
         color: #fff;
-        font-family: "Montserrat";
         overflow: hidden;
-    }
-
-    @font-face {
-        font-family: "Montserrat";
-        src: url("$lib/assets/Montserrat.ttf");
     }
 </style>

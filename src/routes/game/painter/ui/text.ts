@@ -1,6 +1,6 @@
 import { BitmapFont, BitmapText, Container, Graphics } from "pixi.js";
 import type { Painter } from "..";
-import type { Vec2 } from "../../../../utils";
+import type { Vec2 } from "../../../utils";
 import { font } from "../textures";
 
 export class UIText {

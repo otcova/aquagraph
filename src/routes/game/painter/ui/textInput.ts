@@ -1,16 +1,16 @@
 import { BitmapFont, BitmapText, Container, FederatedMouseEvent, Graphics, Rectangle, Sprite } from "pixi.js";
 import type { Painter } from "..";
-import type { Vec2 } from "../../../../utils";
+import type { Vec2 } from "../../../utils";
 import { font } from "../textures";
 
 export class UITextInput {
 	private active = false;
 	private bitmapText?: BitmapText;
-	private textSprite = new Sprite();
 	private graphics = new Graphics();
 	private container = new Container();
 	private placeholder = "";
 	text = "";
+	toUpperCase = false;
 	private hx = 9;
 	private hy = 2;
 
@@ -19,19 +19,18 @@ export class UITextInput {
 
 		this.painter.layers.ui.addChild(this.container);
 		this.container.addChild(this.graphics);
-		this.container.addChild(this.textSprite);
 
 		this.graphics.eventMode = "static";
 		this.graphics.cursor = "text";
 		
-		this.onActive = this.onActive.bind(this);
+		this.focus = this.focus.bind(this);
 		this.onPointerEnter = this.onPointerEnter.bind(this);
 		this.onPointerLeave = this.onPointerLeave.bind(this);
 		this.onKeyPress = this.onKeyPress.bind(this);
 		this.onKeyDown = this.onKeyDown.bind(this);
 		this.onMouseDown = this.onMouseDown.bind(this);
 		
-		this.graphics.on('pointerdown', this.onActive);
+		this.graphics.on('pointerdown', this.focus);
 		this.graphics.on('pointerenter', this.onPointerEnter);
 		this.graphics.on('pointerleave', this.onPointerLeave);
 		document.addEventListener("keypress", this.onKeyPress);
@@ -51,7 +50,7 @@ export class UITextInput {
 		this.container.visible = true;
 	}
 	
-	private onActive(event?: FederatedMouseEvent) {
+	focus(event?: FederatedMouseEvent) {
 		event?.nativeEvent.preventDefault();
 		
 		this.active = true;
@@ -108,9 +107,10 @@ export class UITextInput {
 
 	private onKeyPress(event: KeyboardEvent) {
 		if (this.active && !event.ctrlKey && !event.altKey) {
-			if (event.code.startsWith("Key") || event.code.startsWith("Digit")) {
+			if (event.key.match(/[a-zA-Z0-9àèìòùáéíóú'¡!¿?]/)) {
 				let text = this.text ?? "";
-				this.updateText(text + event.key);
+				const key = this.toUpperCase? event.key.toUpperCase() : event.key;
+				this.updateText(text + key);
 			}
 		}
 	}
@@ -122,17 +122,16 @@ export class UITextInput {
 	async updateText(text: string) {
 		this.text = text;
 		const bitmapFont: BitmapFont = await font;
-		
+	
 		if (!this.bitmapText) {
-
 			this.bitmapText = new BitmapText(text, {
 				align: "center",
 				fontSize: this.hy * 1.2,
 				fontName: bitmapFont.font,
 			});
+			
+			this.container.addChild(this.bitmapText);
 
-			this.renderText = this.renderText.bind(this);
-			this.painter.app.renderer.on("resize", this.renderText);
 		} else {
 			this.bitmapText.text = text || this.placeholder;
 		}
@@ -145,25 +144,12 @@ export class UITextInput {
 		
 		if (text) this.text = this.bitmapText.text;
 
-		this.renderText();
-	}
+		this.bitmapText.position.set(-this.bitmapText.width / 2, -this.hy * 0.7);
 
-	private renderText() {
-		if (!this.bitmapText) return;
-
-		this.textSprite.texture?.destroy();
-		this.textSprite.texture = this.painter.app.renderer.generateTexture(this.bitmapText, {
-			region: new Rectangle(0, 0, this.hx*2, this.hy * 2),
-			resolution: Math.ceil(this.painter.camera.uiScale * 2),
-		});
-		
-		this.textSprite.position.set(-this.bitmapText.width / 2, -this.hy * 0.7);
 	}
 
 	destroy() {
-		this.painter.app.renderer.removeListener("resize", this.renderText);
 		this.bitmapText?.destroy();
-		this.textSprite.destroy();
 		this.graphics.destroy();
 		this.container.destroy();
 		

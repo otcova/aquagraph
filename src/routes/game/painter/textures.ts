@@ -21,12 +21,13 @@ async function loadXML(url: string): Promise<Document> {
 	});
 }
 
-
+import fontXML from "$lib/assets/fonts/font.xml?url";
+import fontPNG from "$lib/assets/fonts/font.png";
 
 export const font = new Promise<BitmapFont>(async (resolve) => {
 	const [data, image] = await Promise.all([
-		loadXML("assets/fonts/font.xml"),
-		loadTexture("assets/fonts/font.png"),
+		loadXML(fontXML),
+		loadTexture(fontPNG),
 	]);
 	const font = BitmapFont.install(data, image, true);
 	resolve(font);

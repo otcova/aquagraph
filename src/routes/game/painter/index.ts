@@ -1,9 +1,9 @@
 import { Layer, Stage } from "@pixi/layers";
 import { AmbientLight, diffuseGroup, lightGroup, normalGroup } from "@pixi/lights";
 import { Application, Container } from "pixi.js";
-import type { Camera, Game } from "../..";
-import { GameDif } from "../../dif";
-import type { Minigame } from "../../minigames";
+import type { Camera, Game } from "..";
+import { GameDif } from "../dif";
+import type { MinigameManager } from "../minigame";
 import { Background } from "./background";
 import { CameraFrame } from "./cameraFrame";
 import { EntitiesPainter } from "./entities";
@@ -11,7 +11,7 @@ import { AppLayers } from "./layers";
 import { UI } from "./ui";
 
 export class Painter {
-    private host!: Minigame;
+    private host!: MinigameManager;
     private previousGameDrawn?: Game;
     private background: Background;
     private pastTime?: number;
@@ -59,11 +59,17 @@ export class Painter {
         container.appendChild(this.app.view as HTMLCanvasElement);
     }
     
-    start(minigame: Minigame) {
+    start(minigame: MinigameManager) {
         this.host = minigame;
         this.app.ticker.add(this.update.bind(this));
     }
-
+    
+    reset() {
+        this.previousGameDrawn = undefined;
+        this.pastTime = undefined;
+        this.entities.clear();
+    }
+    
     private update() {
         const now = performance.now() / 1000;
 

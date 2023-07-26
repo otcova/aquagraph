@@ -10,7 +10,7 @@ export class GameDif {
         lakes: MapDif<EntityId, Lake>,
         frameBoxes: MapDif<EntityId, FrameBox>,
     };
-    
+
     light?: number;
     time?: number;
 
@@ -31,7 +31,7 @@ export class GameDif {
                 lakes: new MapDif(past?.entities.lakes, current.entities.lakes),
                 frameBoxes: new MapDif(past?.entities.frameBoxes, current.entities.frameBoxes),
             };
-            
+
             if (past?.time != current.time) this.time = current.time;
             if (past?.light != current.light) this.light = current.light;
 
@@ -40,20 +40,20 @@ export class GameDif {
             }
         }
     }
-    
+
     apply(game: Game): Game {
         const newGame: Game = {
             camera: this.camera ?? game.camera,
-            entities: game.entities,
+            entities: {
+                players: MapDif.apply(this.entities.players, game.entities.players),
+                boxes: MapDif.apply(this.entities.boxes, game.entities.boxes),
+                lakes: MapDif.apply(this.entities.lakes, game.entities.lakes),
+                frameBoxes: MapDif.apply(this.entities.frameBoxes, game.entities.frameBoxes),
+            },
             time: this.time ?? game.time,
             light: this.light ?? game.light,
         };
-        
-        this.entities.players.apply(newGame.entities.players);
-        this.entities.boxes.apply(newGame.entities.boxes);
-        this.entities.lakes.apply(newGame.entities.lakes);
-        this.entities.frameBoxes.apply(newGame.entities.frameBoxes);
-        
+
         return newGame;
     }
 }
@@ -88,11 +88,13 @@ export class MapDif<Key, Value> {
             this.added = Array.from(current);
         }
     }
-    
-    apply(map: Map<Key, Value>) {
-        for (const key of this.removed) map.delete(key);
-        for (const [key, value] of this.updated) map.set(key, value);
-        for (const [key, value] of this.added) map.set(key, value);
+
+    static apply<Key, Value>(self: MapDif<Key, Value>, map: Map<Key, Value>): Map<Key, Value> {
+        const newMap = new Map(map);
+        for (const key of self.removed) newMap.delete(key);
+        for (const [key, value] of self.updated) newMap.set(key, value);
+        for (const [key, value] of self.added) newMap.set(key, value);
+        return newMap;
     }
 }
 

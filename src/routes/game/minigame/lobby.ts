@@ -1,34 +1,35 @@
-import { MinigameHost } from ".";
+import type { MinigameManager, MinigameTemplate } from ".";
 import type { Camera, Game, Player, User } from "..";
 import { randomRange, type Vec2 } from "../../utils";
-import type { UI } from "../client/painter/ui";
-import type { UIButton } from "../client/painter/ui/button";
-import type { UIText } from "../client/painter/ui/text";
-import type { UITextInput } from "../client/painter/ui/textInput";
 import { GameDif } from "../dif";
 import { createFrameBoxes } from "../game_creation";
 import { createRandomBlob } from "../game_creation/lake";
+import type { UIButton } from "../painter/ui/button";
+import type { UIText } from "../painter/ui/text";
+import type { UITextInput } from "../painter/ui/textInput";
 import { randomSkin } from "../skins/player";
 
-export class Lobby extends MinigameHost {
+export class Lobby implements MinigameTemplate {
 
 	private nameInput: UITextInput;
 	private partyIdInput: UITextInput;
 	private partyIdText: UIText;
 	private joinPublicLobbyButton: UIButton;
+	
 	private joinLobbyButton: UIButton;
 	private connectButton: UIButton;
 	private createLobbyButton: UIButton;
 	private exitLobbyButton: UIButton;
 
-	constructor(user: User, ui: UI) {
-		super(Lobby.initialGame(), user);
+	constructor(private manager: MinigameManager) {
+		const ui = manager.painter.ui;
 
 		this.nameInput = ui.createTextInput([-20, -10]);
 		this.nameInput.setPlaceHolder("Name");
 
 		this.partyIdInput = ui.createTextInput([-20, -2]);
 		this.partyIdInput.setPlaceHolder("Party ID?");
+		this.partyIdInput.toUpperCase = true;
 
 		this.partyIdText = ui.createText([-20, 4]);
 
@@ -37,15 +38,10 @@ export class Lobby extends MinigameHost {
 
 		this.joinLobbyButton = ui.createButton([-20, 4], "Join Lobby");
 		this.joinLobbyButton.onClick = () => this.setJoinLobby();
-		
+
 		this.connectButton = ui.createButton([-20, 4], "Connect");
-		this.connectButton.onClick = async () => {
-			if (!this.partyIdInput.text) return;
-			this.connectButton.hide();
-			this.partyIdText.show();
-			this.partyIdText.updateText("Connecting ...");
-		};
-		
+		this.connectButton.onClick = () => this.setConnecting();
+
 		this.createLobbyButton = ui.createButton([-20, 10], "Create Lobby");
 		this.createLobbyButton.onClick = () => this.setCreatingLobby();
 
@@ -54,8 +50,8 @@ export class Lobby extends MinigameHost {
 
 		this.setMainScreen();
 	}
-	
-	protected static initialGame(): Game {
+
+	static initialGame(): Game {
 		const camera: Camera = {
 			position: [0, 0],
 			size: [110 * 1.8, 110],
@@ -90,7 +86,7 @@ export class Lobby extends MinigameHost {
 			time: 0,
 			light: 0.5,
 		};
-		
+
 		return game;
 	}
 
@@ -103,13 +99,15 @@ export class Lobby extends MinigameHost {
 		this.joinLobbyButton.show();
 		this.joinPublicLobbyButton.show();
 		this.createLobbyButton.show();
+		
+		this.manager.setupHost(Lobby.initialGame());
 	}
 
 	private setLobbyHost() {
-		if (!this.host) return this.setMainScreen();
-		const id = this.host.getPartyId();
+		if (!this.manager.host) return this.setMainScreen();
+		const id = this.manager.host.getPartyId();
 		if (!id) this.setMainScreen();
-		
+
 		this.partyIdInput.hide();
 		this.joinLobbyButton.hide();
 		this.joinPublicLobbyButton.hide();
@@ -133,12 +131,16 @@ export class Lobby extends MinigameHost {
 		this.partyIdText.show();
 
 		this.partyIdText.updateText("Party ID:  ...");
-		
-		if (!this.host) this.setupHost(Lobby.initialGame());
-		if (!this.host) return this.setMainScreen();
-		
-		await this.host.openParty();
-		this.setLobbyHost();
+
+		try {
+			if (!this.manager.host) this.manager.setupHost(Lobby.initialGame());
+			if (!this.manager.host) return this.setMainScreen();
+
+			await this.manager.host.openParty();
+			this.setLobbyHost();
+		} catch (_) {
+			this.setMainScreen();
+		}
 	}
 
 	private setJoinLobby() {
@@ -146,10 +148,11 @@ export class Lobby extends MinigameHost {
 		this.joinLobbyButton.hide();
 		this.joinPublicLobbyButton.hide();
 		this.createLobbyButton.hide();
-		
+
 		this.connectButton.show();
 		this.exitLobbyButton.show();
 		this.partyIdInput.show();
+		setTimeout(() => this.partyIdInput.focus());
 	}
 
 	private setJoinPublicLobby() {
@@ -160,12 +163,23 @@ export class Lobby extends MinigameHost {
 
 		this.exitLobbyButton.show();
 		this.partyIdText.show();
-		
+
 		this.partyIdText.updateText(":(");
 	}
 
-	private setLobbyGuest() {
+	private async setConnecting() {
+		if (!this.partyIdInput.text) return;
 
+		this.connectButton.hide();
+		this.exitLobbyButton.hide();
+		this.partyIdText.show();
+		this.partyIdText.updateText("Connecting ...");
+
+		try {
+			await this.manager.setupGuest(this.partyIdInput.text);
+		} catch (_) {
+			this.setJoinLobby();
+		}
 	}
 
 	spawnPlayer(user: User): Player {
@@ -186,7 +200,7 @@ export class Lobby extends MinigameHost {
 	}
 
 	update(deltaTime: number) {
-		const simulator = this.getSimulator();
+		const simulator = this.manager.getSimulator();
 		const dif = new GameDif();
 		const game = simulator.game;
 
@@ -212,9 +226,12 @@ export class Lobby extends MinigameHost {
 
 	destroy() {
 		this.nameInput.destroy();
+		this.partyIdInput.destroy();
 		this.partyIdText.destroy();
 		this.joinPublicLobbyButton.destroy();
+		
 		this.joinLobbyButton.destroy();
+		this.connectButton.destroy();
 		this.createLobbyButton.destroy();
 		this.exitLobbyButton.destroy();
 	}

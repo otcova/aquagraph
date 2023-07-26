@@ -1,7 +1,7 @@
 import type Box2D from "box2dweb";
 import type { Player } from "../../..";
 import { PlayingPlayer } from "./playingPlayer";
-import type { PlayerInput } from "../../../client/playerInput";
+import type { PlayerInput } from "../../../playerInput";
 
 export class PlayerSimulator {
 

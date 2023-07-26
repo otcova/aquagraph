@@ -1,5 +1,5 @@
 import type { Painter } from "..";
-import type { Vec2 } from "../../../../utils";
+import type { Vec2 } from "../../../utils";
 import { UIButton } from "./button";
 import { UIText } from "./text";
 import { UITextInput } from "./textInput";

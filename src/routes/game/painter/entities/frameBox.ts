@@ -1,7 +1,7 @@
 import { normalGroup } from "@pixi/lights";
 import { Graphics } from "pixi.js";
 import type { Painter } from "..";
-import type { FrameBox } from "../../..";
+import type { FrameBox } from "../..";
 
 export class FrameBoxPainter {
     graphics: Graphics;

@@ -1,7 +1,6 @@
-import type { Container } from "pixi.js";
-import type { DashEffect, Player } from "../../../..";
-import { dashParticlesConfig } from "./dash";
 import { Emitter, type EmitterConfigV3 } from "@pixi/particle-emitter";
+import type { Container } from "pixi.js";
+import type { Player } from "../../..";
 
 export class EmitterGroup {
 	private emitters: Emitter[];
@@ -24,5 +23,9 @@ export class EmitterGroup {
 			} else emitter.destroy();
 		}
 		return active;
+	}
+
+	destroy() {
+		for (const emitter of this.emitters) emitter.destroy();
 	}
 }

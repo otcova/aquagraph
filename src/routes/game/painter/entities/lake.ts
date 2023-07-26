@@ -2,22 +2,23 @@ import { normalGroup } from "@pixi/lights";
 import { DRAW_MODES, Mesh, MeshGeometry, MeshMaterial, Texture, utils } from "pixi.js";
 import { quadOut } from "svelte/easing";
 import type { Painter } from "..";
-import type { Lake } from "../../..";
-import { smoothSubdividePolygon } from "../../../game_creation/lake";
+import type { Lake } from "../..";
+import { smoothSubdividePolygon } from "../../game_creation/lake";
 
 export class LakePainter {
     mesh: Mesh;
     shadows: Mesh[] = [];
     normalShadows: Mesh[] = [];
+    geometry: MeshGeometry;
 
     constructor(painter: Painter, lake: Lake) {
         const vertices = smoothSubdividePolygon(lake.vertices, 8);
         const indices = new Int16Array(utils.earcut(vertices));
-        const geometry = new MeshGeometry(vertices, undefined, indices);
+        this.geometry = new MeshGeometry(vertices, undefined, indices);
         
         for (let i = 0; i < 3; ++i) {
             const mesh = new Mesh(
-                geometry,
+                this.geometry,
                 new MeshMaterial(Texture.WHITE),
                 undefined,
                 DRAW_MODES.TRIANGLES,
@@ -31,7 +32,7 @@ export class LakePainter {
         }
         
         this.mesh = new Mesh(
-            geometry,
+            this.geometry,
             new MeshMaterial(Texture.WHITE),
             undefined,
             DRAW_MODES.TRIANGLES,
@@ -43,7 +44,7 @@ export class LakePainter {
 
         for (let i = 0; i < 3; ++i) {
             const mesh = new Mesh(
-                geometry,
+                this.geometry,
                 new MeshMaterial(Texture.WHITE),
                 undefined,
                 DRAW_MODES.TRIANGLES,
@@ -82,5 +83,10 @@ export class LakePainter {
         }
     }
 
-    destroy() { }
+    destroy() {
+        this.mesh.destroy();
+        for (const mesh of this.shadows) mesh.destroy();
+        for (const mesh of this.normalShadows) mesh.destroy();
+        this.geometry.destroy();
+    }
 }

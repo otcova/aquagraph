@@ -1,9 +1,16 @@
+import lampTextureURL from "$lib/assets/lamp.png";
+import lampNormTextureURL from "$lib/assets/lampNorm.png";
 import { normalGroup, PointLight } from "@pixi/lights";
 import { Container, Sprite } from "pixi.js";
 import type { Painter } from "..";
-import type { Box, Game } from "../../..";
-import type { Vec2 } from "../../../../utils";
-import { boxGraphics, type BoxGraphics } from "../../../skins/box";
+import type { Box } from "../..";
+import type { Vec2 } from "../../../utils";
+import { boxGraphics, type BoxGraphics } from "../../skins/box";
+import { loadTexture } from "../textures";
+
+const lampTexture = loadTexture(lampTextureURL);
+const lampNormTexture = loadTexture(lampNormTextureURL);
+
 
 export class BoxPainter {
     container = new Container();
@@ -24,7 +31,7 @@ export class BoxPainter {
         painter.layers.box.addChild(this.container);
         this.container.addChild(this.graphics.diffuse);
         this.container.addChild(this.graphics.normal);
-        
+
         this.updateLight(painter.sceneLight.brightness);
     }
 
@@ -50,14 +57,21 @@ export class BoxPainter {
 
 class Lamp {
     container = new Container();
-    img = Sprite.from('assets/lamp.png');
-    imgNormal = Sprite.from('assets/lampNorm.png');
+    img = new Sprite();
+    imgNormal = new Sprite();
     light: PointLight;
 
     brightnessTarget = 1;
 
     constructor(painter: Painter, parent: Container, box: Box, pos: Vec2) {
         this.light = new PointLight(0xaa4203, this.brightnessTarget);
+
+        lampTexture.then(tex => {
+            if (this.img) this.img.texture = tex;
+        });
+        lampNormTexture.then(tex => {
+            if (this.imgNormal) this.imgNormal.texture = tex;
+        });
 
         parent.addChild(this.container);
         this.container.addChild(this.img);
@@ -79,7 +93,7 @@ class Lamp {
     animate(deltaTime: number) {
         this.light.brightness += (0.5 - Math.random()) * Math.min(0.5, deltaTime) * 4;
         this.light.brightness = Math.max(
-            this.brightnessTarget / 2, 
+            this.brightnessTarget / 2,
             Math.min(this.brightnessTarget * 2, this.light.brightness)
         );
     }
@@ -91,8 +105,8 @@ class Lamp {
 
     destroy() {
         this.container.destroy();
-        this.img.destroy();
-        this.imgNormal.destroy();
+        this.img?.destroy();
+        this.imgNormal?.destroy();
         this.light.destroy();
     }
 }

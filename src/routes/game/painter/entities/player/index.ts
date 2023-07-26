@@ -1,8 +1,8 @@
 import { PointLight, normalGroup } from "@pixi/lights";
 import { Emitter } from "@pixi/particle-emitter";
 import type { Painter } from "../..";
-import type { Player } from "../../../..";
-import { playerGraphics, type PlayerGraphics } from "../../../../skins/player";
+import type { Player } from "../../..";
+import { playerGraphics, type PlayerGraphics } from "../../../skins/player";
 import { EmitterGroup } from "./emitterGroup";
 import { waterParticles } from "./water";
 import { dashParticlesConfig } from "./dash";
@@ -72,7 +72,13 @@ export class PlayerPainter {
 		this.emitterGroups = this.emitterGroups.filter(effect => effect.update(this.player, deltaTime));
 	}
 
-	destroy() { }
+	destroy() {
+		this.graphics.body.destroy();
+		this.graphics.eye.destroy();
+		this.graphics.normalBody.destroy();
+		this.waterEmitter.destroy();
+		for (const emitter of this.emitterGroups) emitter.destroy();
+	}
 }
 
 

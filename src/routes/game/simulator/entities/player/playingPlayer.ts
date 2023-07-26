@@ -5,7 +5,7 @@ import type { PlayerSkin } from "../../../skins/player";
 import { CATEGORY_BIT, shapeFromVertices } from "../../box2d_utils";
 import { UserData, type ContactType } from "../../contact_listener";
 import type { Vec2 } from "../../../../utils";
-import type { PlayerInput } from "../../../client/playerInput";
+import type { PlayerInput } from "../../../playerInput";
 
 export class PlayingPlayer {
     private body: Box2D.Dynamics.b2Body;

@@ -1,15 +1,22 @@
 import Peer, { DataConnection } from "peerjs";
+import { replacer, reviver } from "./jsonSerialize";
 
 export class NetworkDataChannel {
 	messageQueue: any[] = [];
 	promiseReceivers: { resolve: (msg: any) => void, reject: (e: any) => void }[] = [];
 	handles: ((msg: any) => void)[] = [];
+	onClose?: () => void;
 
 	constructor(protected connection: DataConnection) {
 		connection.on("data", this.handleMessage.bind(this));
+		connection.on("close", () => {
+			if (this.onClose) this.onClose();
+			else console.error("[NetworkDataChannel] No onClose Handle");
+		});
 	}
 
-	private handleMessage(msg: any) {
+	private handleMessage(rawMsg: any) {
+		const msg = JSON.parse(rawMsg, reviver);
 		this.messageQueue.push(msg);
 		this.distributeMessage();
 	}
@@ -40,9 +47,9 @@ export class NetworkDataChannel {
 		this.handles.push(handle);
 		this.distributeMessage();
 	}
-	
+
 	send(message: any) {
-		this.connection.send(message);
+		this.connection.send(JSON.stringify(message, replacer));
 	}
 
 	destroy() {
@@ -62,9 +69,9 @@ export class NetworkHost {
 
 	static createParty(): Promise<NetworkHost> {
 		let id;
-		while (!id || id.includes("O") || id.includes("0"))
-			id = Math.floor(Math.random() * (36**4)).toString(36).toUpperCase();
-		
+		while (!id || id.includes("O") || id.includes("0") || id.includes("2") || id.includes("Z"))
+			id = Math.floor(Math.random() * (36 ** 2)).toString(36).toUpperCase();
+
 		const peer = new Peer(id);
 		return new Promise((resolve, error) => {
 			peer.on("open", () => resolve(new NetworkHost(peer)));
@@ -92,7 +99,9 @@ export class NetworkGuest extends NetworkDataChannel {
 		const peer = new Peer();
 		return new Promise((resolve, reject) => {
 			peer.on("open", () => {
-				const conn = peer.connect(partyId);
+				const conn = peer.connect(partyId, {
+					serialization: "none",
+				});
 				const net = new NetworkGuest(peer, conn);
 				conn.on("open", () => resolve(net));
 				conn.on("error", (...args) => reject(args));
@@ -106,5 +115,3 @@ export class NetworkGuest extends NetworkDataChannel {
 		this.peer.destroy();
 	}
 }
-
-
