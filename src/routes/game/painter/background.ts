@@ -1,44 +1,53 @@
 import { normalGroup } from "@pixi/lights";
-import { Graphics } from "pixi.js";
+import { Graphics, Sprite, Texture } from "pixi.js";
 import { createNoise2D } from "simplex-noise";
 import type { Painter } from ".";
 import type { GameDif } from "../dif";
+import type { Vec2 } from "../../utils";
 
 export class Background {
     private normals: Graphics;
+    private color: Sprite;
 
     constructor(painter: Painter) {
         this.normals = new Graphics();
         this.normals.parentGroup = normalGroup;
-        paintNormals(this.normals);
         painter.layers.background.addChild(this.normals);
-
-        let g = new Graphics();
-        g.beginFill(0x222222);
-        g.drawRect(-20000, -20000, 40000, 40000);
-        g.endFill();
-        painter.layers.background.addChild(g);
+        
+        this.color = new Sprite(Texture.WHITE);
+        this.color.tint = 0x222222;
+        painter.layers.background.addChild(this.color);
     }
 
     update(gameDif: GameDif) {
         const camera = gameDif.camera;
         if (camera) {
-            const margin = 50;
-        
-            const width = camera.size[0] + margin * 2;
-            const height = camera.size[1] + margin * 2;
+            const margin = 20;
+
+            const w = camera.size[0] + margin * 2;
+            const h = camera.size[1] + margin * 2;
+
+            this.normals.clear();
+            paintNormals(this.normals, [w, h]);
+            this.normals.position.set(camera.position[0] - w / 2, camera.position[1] - h / 2);
             
-            this.normals.position.set(camera.position[0] - width / 2, camera.position[1] - height / 2);
+            this.color.position.set(camera.position[0] - w / 2, camera.position[1] - h / 2);
+            this.color.scale.set(w / this.color.texture.width, h / this.color.texture.height);
         }
+    }
+
+    destroy() {
+        this.color.destroy();
+        this.normals.destroy();
     }
 }
 
 const noise = createNoise2D();
 
-function paintNormals(g: Graphics): Graphics {
-    const width = 80;
-    const height = 40;
+function paintNormals(g: Graphics, size: Vec2): Graphics {
     const space = 10;
+    const width = Math.ceil(size[0] / space);
+    const height = Math.ceil(size[1] / space);
 
     // [x, y, height, ...]
     const vertices = new Float32Array(3 * width * height);

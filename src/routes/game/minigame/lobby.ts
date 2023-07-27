@@ -11,42 +11,46 @@ import { randomSkin } from "../skins/player";
 
 export class Lobby implements MinigameTemplate {
 
-	private nameInput: UITextInput;
-	private partyIdInput: UITextInput;
-	private partyIdText: UIText;
-	private joinPublicLobbyButton: UIButton;
-	
-	private joinLobbyButton: UIButton;
-	private connectButton: UIButton;
-	private createLobbyButton: UIButton;
-	private exitLobbyButton: UIButton;
+	private ui: {
+		nameInput: UITextInput;
+		partyIdInput: UITextInput;
+		partyIdText: UIText;
+		joinPublicLobbyButton: UIButton;
+
+		playButton: UIButton;
+		joinLobbyButton: UIButton;
+		connectButton: UIButton;
+		createLobbyButton: UIButton;
+		exitButton: UIButton;
+	};
 
 	constructor(private manager: MinigameManager) {
 		const ui = manager.painter.ui;
 
-		this.nameInput = ui.createTextInput([-20, -10]);
-		this.nameInput.setPlaceHolder("Name");
+		this.ui = {
+			nameInput: ui.createTextInput([-20, -10]),
+			partyIdInput: ui.createTextInput([-20, -2]),
+			partyIdText: ui.createText([-20, -2]),
 
-		this.partyIdInput = ui.createTextInput([-20, -2]);
-		this.partyIdInput.setPlaceHolder("Party ID?");
-		this.partyIdInput.toUpperCase = true;
+			joinPublicLobbyButton: ui.createButton([-20, -2], "Join Public Lobby"),
+			playButton: ui.createButton([-20, 4], "Play"),
+			joinLobbyButton: ui.createButton([-20, 4], "Join Lobby"),
+			connectButton: ui.createButton([-20, 4], "Connect"),
+			createLobbyButton: ui.createButton([-20, 10], "Create Lobby"),
+			exitButton: ui.createButton([-20, 10], "Exit"),
+		};
+		this.ui.nameInput.setPlaceHolder("Name");
 
-		this.partyIdText = ui.createText([-20, 4]);
+		this.ui.partyIdInput.setPlaceHolder("Party ID?");
+		this.ui.partyIdInput.toUpperCase = true;
+		this.ui.partyIdInput.onEnter = () => this.setConnecting();
 
-		this.joinPublicLobbyButton = ui.createButton([-20, -2], "Join Public Lobby");
-		this.joinPublicLobbyButton.onClick = () => this.setJoinPublicLobby();
-
-		this.joinLobbyButton = ui.createButton([-20, 4], "Join Lobby");
-		this.joinLobbyButton.onClick = () => this.setJoinLobby();
-
-		this.connectButton = ui.createButton([-20, 4], "Connect");
-		this.connectButton.onClick = () => this.setConnecting();
-
-		this.createLobbyButton = ui.createButton([-20, 10], "Create Lobby");
-		this.createLobbyButton.onClick = () => this.setCreatingLobby();
-
-		this.exitLobbyButton = ui.createButton([-20, 10], "Exit");
-		this.exitLobbyButton.onClick = () => this.setMainScreen();
+		this.ui.joinPublicLobbyButton.onClick = () => this.setJoinPublicLobby();
+		this.ui.playButton.onClick = () => this.manager.changeMinigame("race");
+		this.ui.joinLobbyButton.onClick = () => this.setJoinLobby();
+		this.ui.connectButton.onClick = () => this.setConnecting();
+		this.ui.createLobbyButton.onClick = () => this.setCreatingLobby();
+		this.ui.exitButton.onClick = () => this.setMainScreen();
 
 		this.setMainScreen();
 	}
@@ -90,16 +94,20 @@ export class Lobby implements MinigameTemplate {
 		return game;
 	}
 
-	private setMainScreen() {
-		this.exitLobbyButton.hide();
-		this.partyIdText.hide();
-		this.partyIdInput.hide();
-		this.connectButton.hide();
+	private applyUI(effect: (ui: UIButton | UIText | UITextInput) => void) {
+		for (const uiName in this.ui) {
+			effect(this.ui[uiName as keyof typeof this.ui]);
+		}
+	}
 
-		this.joinLobbyButton.show();
-		this.joinPublicLobbyButton.show();
-		this.createLobbyButton.show();
-		
+	private setMainScreen() {
+		this.applyUI(ui => ui.hide());
+
+		this.ui.nameInput.show();
+		this.ui.joinLobbyButton.show();
+		this.ui.joinPublicLobbyButton.show();
+		this.ui.createLobbyButton.show();
+
 		this.manager.setupHost(Lobby.initialGame());
 	}
 
@@ -108,29 +116,28 @@ export class Lobby implements MinigameTemplate {
 		const id = this.manager.host.getPartyId();
 		if (!id) this.setMainScreen();
 
-		this.partyIdInput.hide();
-		this.joinLobbyButton.hide();
-		this.joinPublicLobbyButton.hide();
-		this.createLobbyButton.hide();
-		this.connectButton.hide();
+		this.applyUI(ui => ui.hide());
+		
+		this.ui.nameInput.show();
+		this.ui.partyIdText.show();
+		this.ui.playButton.show();
+		this.ui.exitButton.show();
 
-		this.exitLobbyButton.show();
-		this.partyIdText.show();
-
-		this.partyIdText.updateText("Party ID:  " + id);
+		this.ui.partyIdText.updateText("Party ID:  " + id);
 	}
 
 	private async setCreatingLobby() {
-		this.partyIdInput.hide();
-		this.joinLobbyButton.hide();
-		this.joinPublicLobbyButton.hide();
-		this.createLobbyButton.hide();
-		this.connectButton.hide();
+		this.ui.partyIdInput.hide();
+		this.ui.joinLobbyButton.hide();
+		this.ui.joinPublicLobbyButton.hide();
+		this.ui.createLobbyButton.hide();
+		this.ui.connectButton.hide();
 
-		this.exitLobbyButton.show();
-		this.partyIdText.show();
+		this.ui.nameInput.show();
+		this.ui.exitButton.show();
+		this.ui.partyIdText.show();
 
-		this.partyIdText.updateText("Party ID:  ...");
+		this.ui.partyIdText.updateText("Party ID:  ...");
 
 		try {
 			if (!this.manager.host) this.manager.setupHost(Lobby.initialGame());
@@ -144,42 +151,54 @@ export class Lobby implements MinigameTemplate {
 	}
 
 	private setJoinLobby() {
-		this.partyIdText.hide();
-		this.joinLobbyButton.hide();
-		this.joinPublicLobbyButton.hide();
-		this.createLobbyButton.hide();
+		this.applyUI(ui => ui.hide());
 
-		this.connectButton.show();
-		this.exitLobbyButton.show();
-		this.partyIdInput.show();
-		setTimeout(() => this.partyIdInput.focus());
+		this.ui.nameInput.show();
+		this.ui.connectButton.show();
+		this.ui.exitButton.show();
+		this.ui.partyIdInput.show();
+		setTimeout(() => this.ui.partyIdInput.focus());
 	}
 
 	private setJoinPublicLobby() {
-		this.joinLobbyButton.hide();
-		this.joinPublicLobbyButton.hide();
-		this.createLobbyButton.hide();
-		this.connectButton.hide();
+		this.applyUI(ui => ui.hide());
 
-		this.exitLobbyButton.show();
-		this.partyIdText.show();
+		this.ui.nameInput.show();
+		this.ui.exitButton.show();
+		this.ui.partyIdText.show();
 
-		this.partyIdText.updateText(":(");
+		this.ui.partyIdText.updateText(":(");
 	}
 
 	private async setConnecting() {
-		if (!this.partyIdInput.text) return;
+		if (!this.ui.partyIdInput.text) return;
 
-		this.connectButton.hide();
-		this.exitLobbyButton.hide();
-		this.partyIdText.show();
-		this.partyIdText.updateText("Connecting ...");
+		this.applyUI(ui => ui.hide());
+		
+		this.ui.nameInput.show();
+		this.ui.partyIdText.show();
+		this.ui.partyIdText.updateText("Connecting ...");
 
 		try {
-			await this.manager.setupGuest(this.partyIdInput.text);
+			await this.manager.setupGuest(this.ui.partyIdInput.text);
+			this.setLobbyGuest();
+
 		} catch (_) {
 			this.setJoinLobby();
 		}
+	}
+
+	private setLobbyGuest() {
+		if (!this.manager.guest) return this.setMainScreen();
+		const id = this.manager.guest.getPartyId();
+
+		this.applyUI(ui => ui.hide());
+
+		this.ui.nameInput.show();
+		this.ui.exitButton.show();
+		this.ui.partyIdText.show();
+
+		this.ui.partyIdText.updateText("Party ID:  " + id);
 	}
 
 	spawnPlayer(user: User): Player {
@@ -225,14 +244,6 @@ export class Lobby implements MinigameTemplate {
 	}
 
 	destroy() {
-		this.nameInput.destroy();
-		this.partyIdInput.destroy();
-		this.partyIdText.destroy();
-		this.joinPublicLobbyButton.destroy();
-		
-		this.joinLobbyButton.destroy();
-		this.connectButton.destroy();
-		this.createLobbyButton.destroy();
-		this.exitLobbyButton.destroy();
+		this.applyUI(ui => ui.destroy());
 	}
 };

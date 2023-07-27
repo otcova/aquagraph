@@ -2,8 +2,25 @@ import type { Game, Player, User } from "..";
 import { GuestConnection, HostConnection, type PlayerInputHandle } from "../connection";
 import { Painter } from "../painter";
 import { PlayerIn, type PlayerInput } from "../playerInput";
-import type { Simulator } from "../simulator";
+import { Simulator } from "../simulator";
 import { Lobby } from "./lobby";
+import { Race } from "./race";
+
+interface MinigameConstructor {
+	new(manager: MinigameManager, seed: number): MinigameTemplate;
+	initialGame(): Game;
+}
+
+export type MinigameName = "lobby" | "race";
+export type MinigameInstanceId = {
+	name: MinigameName,
+	seed: number,
+};
+
+const minigames = new Map<MinigameName, MinigameConstructor>([
+	["lobby", Lobby],
+	["race", Race],
+]);
 
 export class MinigameManager {
 
@@ -52,9 +69,12 @@ export class MinigameManager {
 		const guest = await GuestConnection.joinParty(partyId, this.user);
 		guest.onClose = () => {
 			this.minigame.destroy();
-			
+
 			this.setupHost(Lobby.initialGame());
 			this.minigame = new Lobby(this);
+		};
+		guest.onMinigameChange = (minigameId) => {
+			this.changeMinigame(minigameId);
 		};
 
 		if (this.guest) {
@@ -85,6 +105,27 @@ export class MinigameManager {
 			if (!player) throw Error("Player Not found");
 			player.handleInput(input);
 		};
+	}
+
+	changeMinigame(minigameId: MinigameInstanceId | MinigameName) {
+		if (typeof minigameId == "string") {
+			minigameId = {
+				name: minigameId,
+				seed: Math.floor(Math.random() * 1000),
+			};
+		}
+
+		const Minigame = minigames.get(minigameId.name);
+		if (!Minigame) throw Error("Invalid minigame: " + minigameId.name);
+
+		if (this.host) this.host.changeGame(minigameId, Minigame.initialGame());
+		else if (this.guest) this.guest.changeGame(Minigame.initialGame());
+
+		this.painter.startTransition();
+		this.minigame.destroy();
+		this.minigame = new Minigame(this, minigameId.seed);
+
+		this.getSimulator().beforeStep = dt => this.minigame.update(dt);
 	}
 
 	getSimulator(): Simulator {

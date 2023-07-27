@@ -1,5 +1,6 @@
 import type { Game, User } from "..";
 import { GameDif } from "../dif";
+import type { MinigameInstanceId } from "../minigame";
 import type { PlayerInput } from "../playerInput";
 import { Simulator } from "../simulator";
 import { NetworkDataChannel, NetworkGuest, NetworkHost } from "./network";
@@ -64,7 +65,7 @@ export class HostConnection {
 			this.simulator.updateGameDif(dif);
 		};
 
-		guest.send({ game: this.guestsGame, id: guestId } as FirstHostMessage);
+		guest.send<FirstHostMessage>({ game: this.guestsGame, id: guestId });
 		this.guests.set(guestId, guest);
 	}
 
@@ -73,7 +74,20 @@ export class HostConnection {
 		const gameDif = new GameDif(this.guestsGame, game);
 		this.guestsGame = game;
 		for (const guest of this.guests.values()) {
-			guest.send({ gameDif } as HostMessage);
+			guest.send<HostMessage>({ gameDif });
+		}
+	}
+	
+	changeGame(minigameId: MinigameInstanceId, game: Game) {
+		this.simulator = new Simulator(game);
+		this.guestsGame = game;
+		for (const guest of this.guests.values()) {
+			guest.send<HostMessage>({
+				changeMinigame: {
+					game,
+					id: minigameId,
+				}
+			});
 		}
 	}
 
@@ -94,6 +108,7 @@ export class GuestConnection {
 	private game: Game;
 	simulator: Simulator;
 	onClose?: () => void;
+	onMinigameChange?: (minigameId: MinigameInstanceId) => void;
 
 	private constructor(public net: NetworkGuest, firstMessage: FirstHostMessage) {
 		this.game = firstMessage.game;
@@ -105,7 +120,7 @@ export class GuestConnection {
 
 	static async joinParty(partyId: string, user: User): Promise<GuestConnection> {
 		const net = await NetworkGuest.joinParty(partyId);
-		net.send({ user } as FirstGuestMessage);
+		net.send<FirstGuestMessage>({ user });
 		const firstMessage = await net.nextMessage() as FirstHostMessage;
 		return new GuestConnection(net, firstMessage);
 	}
@@ -116,11 +131,21 @@ export class GuestConnection {
 			const gameDif = Object.assign(Object.create(GameDif.prototype), message.gameDif);
 			this.game = gameDif.apply(this.game);
 			this.simulator.updateGame(this.game);
-		} else if (message.game) {
-			this.game = message.game;
+		} else if (message.changeMinigame) {
+			this.game = message.changeMinigame.game;
 			this.simulator = new Simulator(this.game);
-			// TODO! this.painter.startTransition();
+			if (this.onMinigameChange) this.onMinigameChange(message.changeMinigame.id);
+			else console.error("No onMinigameChange Handle");
 		}
+	}
+	
+	getPartyId(): string {
+		return this.net.getPartyId();
+	}
+	
+	changeGame(game: Game) {
+		this.simulator = new Simulator(game);
+		this.game = game;
 	}
 
 	destroy(): void {
@@ -133,7 +158,7 @@ export class GuestConnection {
 	}
 
 	sendPlayerInput(input: PlayerInput): void {
-		this.net.send({ input } as GuestMessage);
+		this.net.send<GuestMessage>({ input });
 	}
 }
 
@@ -145,7 +170,10 @@ interface FirstHostMessage {
 // Message send by the host
 interface HostMessage {
 	gameDif?: GameDif;
-	game?: Game;
+	changeMinigame?: {
+		game: Game,
+		id: MinigameInstanceId,
+	};
 }
 
 // Message send by the guest

@@ -94,7 +94,7 @@ const defaultConfig = {
     maxOffset: 0.8,
     minMargin: 0.5,
     maxMargin: 3,
-    long: 30,
+    long: 10,
 };
 
 

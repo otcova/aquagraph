@@ -8,15 +8,16 @@ export class UIText {
 	private container = new Container();
 	private hx = 9;
 	private hy = 2;
-	
+	destroyed = false;
+
 	constructor(private painter: Painter) {
 		this.painter.layers.ui.addChild(this.container);
 	}
-	
+
 	hide() {
 		this.container.visible = false;
 	}
-	
+
 	show() {
 		this.container.visible = true;
 	}
@@ -27,7 +28,7 @@ export class UIText {
 
 	async updateText(text: string) {
 		const bitmapFont: BitmapFont = await font;
-		
+
 		if (!this.bitmapText) {
 			this.bitmapText = new BitmapText(text, {
 				align: "center",
@@ -35,21 +36,24 @@ export class UIText {
 				fontName: bitmapFont.font,
 			});
 			this.bitmapText.tint = 0xffffff;
-			
+
 			this.container.addChild(this.bitmapText);
 		} else {
 			this.bitmapText.text = text;
 		}
-		
+
 		while (this.hx * 2 < this.bitmapText.width) {
 			this.bitmapText.text = this.bitmapText.text.slice(0, -1);
 		}
-		
+
 		this.bitmapText.position.set(-this.bitmapText.width / 2, -this.hy * 0.7);
 	}
 
 	destroy() {
-		this.bitmapText?.destroy();
-		this.container.destroy();
+		if (!this.destroyed) {
+			this.destroyed = true;
+			this.bitmapText?.destroy();
+			this.container.destroy();
+		}
 	}
 }

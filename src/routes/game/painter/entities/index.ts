@@ -74,6 +74,10 @@ EntitiesPainter {
             this[entityType].clear();
         }
     }
+    
+    destroy() {
+        this.clear();
+    }
 
     animate(stepTime: number) {
         for (const entityType of ["players", "lakes", "boxes"] as const) {

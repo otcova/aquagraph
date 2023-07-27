@@ -9,15 +9,27 @@ import { CameraFrame } from "./cameraFrame";
 import { EntitiesPainter } from "./entities";
 import { AppLayers } from "./layers";
 import { UI } from "./ui";
+import type { Vec2 } from "../../utils";
+
+const transitionTime = .5; // time in seconds
 
 export class Painter {
     private host!: MinigameManager;
     private previousGameDrawn?: Game;
-    private background: Background;
     private pastTime?: number;
 
+    private background: Background;
     private entities: EntitiesPainter;
     private cameraFrame: CameraFrame;
+
+    private transition?: {
+        background: Background;
+        entities: EntitiesPainter;
+        cameraFrame: CameraFrame;
+        ui: UI;
+        layers: AppLayers;
+    };
+
     camera: CameraContainer;
 
     sceneLight = new AmbientLight(0xffffff, 0);
@@ -53,23 +65,60 @@ export class Painter {
         this.cameraFrame = new CameraFrame(this);
         this.ui = new UI(this);
 
-        this.camera.container.addChild(...this.layers.listCameraLayers());
-        this.diffuseLayer.addChild(...this.layers.listFrameLayers());
+        this.camera.cameraContainer.addChild(...this.layers.listCameraLayers());
+        this.camera.frameContainer.addChild(...this.layers.listFrameLayers());
 
         container.appendChild(this.app.view as HTMLCanvasElement);
     }
-    
+
     start(minigame: MinigameManager) {
         this.host = minigame;
         this.app.ticker.add(this.update.bind(this));
     }
-    
+
+    startTransition() {
+        this.endTransition();
+        
+        this.ui.startTransition();
+        
+        this.transition = {
+            layers: this.layers,
+            cameraFrame: this.cameraFrame,
+            entities: this.entities,
+            background: this.background,
+            ui: this.ui,
+        };
+        this.layers = new AppLayers();
+        this.camera.startTransition();
+        
+        this.camera.cameraContainer.addChild(...this.layers.listCameraLayers());
+        this.camera.frameContainer.addChild(...this.layers.listFrameLayers());
+        
+        this.cameraFrame = new CameraFrame(this);
+        this.entities = new EntitiesPainter(this);
+        this.background = new Background(this);
+        this.ui = new UI(this);
+        this.pastTime = undefined;
+        this.previousGameDrawn = undefined;
+    }
+
+    private endTransition() {
+        if (this.transition) {
+            this.transition.cameraFrame.destroy();
+            this.transition.entities.destroy();
+            this.transition.layers.destroy();
+            this.transition.background.destroy();
+            this.transition.ui.destroy();
+
+            this.transition = undefined;
+        }
+    }
+
     reset() {
         this.previousGameDrawn = undefined;
-        this.pastTime = undefined;
         this.entities.clear();
     }
-    
+
     private update() {
         const now = performance.now() / 1000;
 
@@ -82,7 +131,10 @@ export class Painter {
                 this.previousGameDrawn = currentGame;
 
                 if (gameDif.light) this.sceneLight.brightness = gameDif.light;
-                if (gameDif.camera) this.camera.update(gameDif);
+                if (gameDif.camera || this.transition) {
+                    this.camera.update(gameDif);
+                    if (this.transition && !this.camera.transition) this.endTransition();
+                }
                 this.background.update(gameDif);
                 this.cameraFrame.update(gameDif);
                 this.entities.updateGame(gameDif);
@@ -96,25 +148,77 @@ export class Painter {
     }
 
     destroy() {
+        this.background.destroy();
+        this.ui.destroy();
+        this.entities.destroy();
+        this.cameraFrame.destroy();
+        this.layers.destroy();
         this.app.destroy(true);
     }
 }
 
 class CameraContainer {
     private camera?: Camera;
-    container = new Container();
-    
+    cameraContainer = new Container();
+    frameContainer = new Container();
+    transition?: {
+        cameraContainer: Container;
+        frameContainer: Container;
+        startTime: number;
+        dir: Vec2;
+    };
+
     // The amount of pixels in one unit
     uiScale = 1;
 
     constructor(private painter: Painter) {
-        painter.diffuseLayer.addChild(this.container);
+        this.frameContainer.addChild(this.cameraContainer);
+        painter.diffuseLayer.addChild(this.frameContainer);
         this.painter.app.renderer.on("resize", this.update.bind(this));
+    }
+
+    startTransition() {
+        this.endTransition();
+        
+        const length = 100;
+        const angle = Math.random() * Math.PI * 2;
+
+        this.transition = {
+            cameraContainer: this.cameraContainer,
+            frameContainer: this.frameContainer,
+            startTime: performance.now() / 1000,
+            dir: [1.5 * length * Math.cos(angle), length * Math.sin(angle)],
+        };
+        this.cameraContainer = new Container();
+        this.frameContainer = new Container();
+
+        this.frameContainer.addChild(this.cameraContainer);
+        this.painter.diffuseLayer.addChildAt(this.frameContainer,0);
     }
 
     update(gameDif?: GameDif) {
         if (gameDif && gameDif.camera) this.camera = gameDif.camera;
         if (this.camera) {
+
+            if (this.transition) {
+                const stage = this.transitionStage();
+                if (stage > 1) {
+                    this.endTransition();
+                } else {
+                    const leaveOffset = [
+                        -this.transition.dir[0] * stage,
+                        -this.transition.dir[1] * stage,
+                    ];
+
+                    const enterOffset = [
+                        this.transition.dir[0] * (1 - stage),
+                        this.transition.dir[1] * (1 - stage),
+                    ];
+
+                    this.transition.frameContainer.position.set(...leaveOffset);
+                    this.frameContainer.position.set(...enterOffset);
+                }
+            }
 
             const margin = 1;
 
@@ -140,10 +244,26 @@ class CameraContainer {
             this.painter.app.stage.scale.set(this.uiScale);
 
             const scale = 100 / this.camera.size[0];
-            this.container.position.set(-this.camera.position[0] * scale, -this.camera.position[1] * scale);
-            this.container.scale.set(scale);
+            this.cameraContainer.position.set(-this.camera.position[0] * scale, -this.camera.position[1] * scale);
+            this.cameraContainer.scale.set(scale);
+        }
+    }
 
+    private transitionStage(): number {
+        if (!this.transition) return 0;
+        const now = performance.now() / 1000;
+        const x = (now - this.transition.startTime) / transitionTime;
+        if (x > 1) return x;
+        return x < 0.5 ? 2 * x * x : 4 * x - 2 * x * x - 1;
+    }
 
+    private endTransition() {
+        if (this.transition) {
+            this.transition.cameraContainer.destroy();
+            this.transition.frameContainer.destroy();
+            this.transition = undefined;
+
+            this.frameContainer.position.set(0);
         }
     }
 }

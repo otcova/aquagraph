@@ -48,7 +48,7 @@ export class NetworkDataChannel {
 		this.distributeMessage();
 	}
 
-	send(message: any) {
+	send<T>(message: T) {
 		this.connection.send(JSON.stringify(message, replacer));
 	}
 
@@ -108,6 +108,10 @@ export class NetworkGuest extends NetworkDataChannel {
 			});
 			peer.on("error", (...args) => reject(args));
 		});
+	}
+	
+	getPartyId(): string {
+		return this.connection.peer;
 	}
 
 	destroy() {

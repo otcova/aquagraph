@@ -36,4 +36,9 @@ export class AppLayers {
             this.ui,
         ];
     }
+
+    destroy() {
+        for (const container of this.listCameraLayers()) container.destroy();
+        for (const container of this.listFrameLayers()) container.destroy();
+    }
 }
