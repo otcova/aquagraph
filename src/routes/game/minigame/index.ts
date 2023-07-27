@@ -8,7 +8,7 @@ import { Race } from "./race";
 
 interface MinigameConstructor {
 	new(manager: MinigameManager, seed: number): MinigameTemplate;
-	initialGame(): Game;
+	initialGame(seed: number): Game;
 }
 
 export type MinigameName = "lobby" | "race";
@@ -101,13 +101,16 @@ export class MinigameManager {
 		simulator.entities.addPlayer(id, player);
 
 		return (input: PlayerInput) => {
-			const player = simulator.entities.players.get(id);
+			if (!this.host) throw Error("Only a host can add handle player input");
+			const player = this.host.simulator.entities.players.get(id);
 			if (!player) throw Error("Player Not found");
 			player.handleInput(input);
 		};
 	}
 
 	changeMinigame(minigameId: MinigameInstanceId | MinigameName) {
+		const players = this.getGame().entities.players;
+
 		if (typeof minigameId == "string") {
 			minigameId = {
 				name: minigameId,
@@ -118,14 +121,22 @@ export class MinigameManager {
 		const Minigame = minigames.get(minigameId.name);
 		if (!Minigame) throw Error("Invalid minigame: " + minigameId.name);
 
-		if (this.host) this.host.changeGame(minigameId, Minigame.initialGame());
-		else if (this.guest) this.guest.changeGame(Minigame.initialGame());
+		const game = Minigame.initialGame(minigameId.seed);
+		if (this.host) this.host.changeGame(minigameId, game);
+		else if (this.guest) this.guest.changeGame(game);
 
 		this.painter.startTransition();
 		this.minigame.destroy();
 		this.minigame = new Minigame(this, minigameId.seed);
+		
+		const simulator = this.getSimulator();
+		
+		for (const [id, gamePlayer] of players) {
+			const player = this.minigame.spawnPlayer(gamePlayer.user);
+			simulator.entities.addPlayer(id, player);
+		}
 
-		this.getSimulator().beforeStep = dt => this.minigame.update(dt);
+		simulator.beforeStep = dt => this.minigame.update(dt);
 	}
 
 	getSimulator(): Simulator {

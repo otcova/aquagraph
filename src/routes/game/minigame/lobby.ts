@@ -1,3 +1,4 @@
+import Alea from "alea";
 import type { MinigameManager, MinigameTemplate } from ".";
 import type { Camera, Game, Player, User } from "..";
 import { randomRange, type Vec2 } from "../../utils";
@@ -55,12 +56,14 @@ export class Lobby implements MinigameTemplate {
 		this.setMainScreen();
 	}
 
-	static initialGame(): Game {
+	static initialGame(seed: number = Math.random()): Game {
+		const rnd = Alea(seed).next;
+		
 		const camera: Camera = {
 			position: [0, 0],
 			size: [110 * 1.8, 110],
 		};
-		const frameBoxes = createFrameBoxes([100, 100 * camera.size[1] / camera.size[0]]);
+		const frameBoxes = createFrameBoxes(rnd, [100, 100 * camera.size[1] / camera.size[0]]);
 
 		frameBoxes.push({
 			color: 0x432612,

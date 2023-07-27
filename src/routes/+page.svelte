@@ -5,9 +5,12 @@
 
     onMount(async () => {
         const clientModule = import("./game/minigame");
+        const playerModule = import("./game/skins/player");
         
         const { MinigameManager } = await clientModule;
-        const client = new MinigameManager(canvasContainer, { name: "A" });
+        const { randomSkin } = await playerModule;
+        
+        const client = new MinigameManager(canvasContainer, { name: "A", skin: randomSkin() });
         
         return () => {
             client.destroy();

@@ -4,6 +4,7 @@ import type { Vec2 } from "../../../utils";
 import { font } from "../textures";
 
 export class UITextInput {
+	private justFocused = false;
 	private active = false;
 	private bitmapText?: BitmapText;
 	private graphics = new Graphics();
@@ -54,7 +55,10 @@ export class UITextInput {
 	}
 
 	focus(event?: FederatedMouseEvent) {
-		event?.nativeEvent.preventDefault();
+		if (event) {
+			this.justFocused = true;
+			setTimeout(() => this.justFocused = false);
+		}
 
 		this.active = true;
 		this.graphics.clear();
@@ -83,8 +87,10 @@ export class UITextInput {
 	}
 
 	private onMouseDown() {
-		this.active = false;
-		this.onPointerLeave();
+		if (this.container.visible && !this.justFocused) {
+			this.active = false;
+			this.onPointerLeave();
+		}
 	}
 
 	private onKeyDown(event: KeyboardEvent) {
@@ -147,7 +153,7 @@ export class UITextInput {
 
 		if (text) this.text = this.bitmapText.text;
 		else this.text = text;
-		
+
 		this.bitmapText.position.set(-this.bitmapText.width / 2, -this.hy * 0.7);
 
 	}

@@ -101,6 +101,7 @@ export class NetworkGuest extends NetworkDataChannel {
 			peer.on("open", () => {
 				const conn = peer.connect(partyId, {
 					serialization: "none",
+					reliable: true,
 				});
 				const net = new NetworkGuest(peer, conn);
 				conn.on("open", () => resolve(net));

@@ -1,21 +1,39 @@
-import { createNoise2D } from "simplex-noise";
 import alea from "alea";
-import type { Vec2 } from "../../utils";
+import { createNoise2D, type NoiseFunction2D } from "simplex-noise";
+import type { NextRandom as RandomFn } from "../../utils";
 
 export function createRandomBlob(seed: number): Float32Array {
-    const random = alea(seed);
-    const noise = createNoise2D(random);
+    return createBlob(randomBlobConfig(alea(seed)));
+}
 
+export interface BlobConfig {
+    noise: NoiseFunction2D,
+    radius: number,
+    angleStep: number,
+    noiseSize: number,
+    noiseScale: number,
+    vertsCount: number,
+}
+
+export function randomBlobConfig(rnd: RandomFn): BlobConfig {
+    const noise = createNoise2D(rnd);
     const vertsCount = 8;
-    const angleStep = 2 * Math.PI / vertsCount;
 
-    let radius = 8 + 20 * random.next();
-    if (radius < 10 && random.next() > 0.5) radius += 12;
+    let radius = 8 + 20 * rnd();
+    if (radius < 10 && rnd() > 0.5) radius += 12;
 
-    const noiseScale = radius * 0.6;
-    const noiseSize = radius / 30;
+    return {
+        noise,
+        radius,
+        angleStep: 2 * Math.PI / vertsCount,
+        noiseSize: radius / 30,
+        noiseScale: radius * 0.6,
+        vertsCount,
+    };
+}
 
-    const verts = new Float32Array(2 * vertsCount);
+export function createBlob(config: BlobConfig): Float32Array {
+    const verts = new Float32Array(2 * config.vertsCount);
 
     let angle = 0;
 
@@ -23,12 +41,12 @@ export function createRandomBlob(seed: number): Float32Array {
         const x = Math.cos(angle);
         const y = Math.sin(angle);
 
-        const r = radius + noiseScale * noise(x * noiseSize, y * noiseSize);
+        const r = config.radius + config.noiseScale * config.noise(x * config.noiseSize, y * config.noiseSize);
 
         verts[i] = r * x;
         verts[i + 1] = r * y;
 
-        angle += angleStep;
+        angle += config.angleStep;
     }
 
     return smoothSubdividePolygon(verts, 4);

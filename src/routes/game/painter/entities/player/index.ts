@@ -17,7 +17,7 @@ export class PlayerPainter {
 	private effectCounter = -Infinity;
 
 	constructor(private painter: Painter, private player: Player) {
-		this.graphics = playerGraphics(player.skin);
+		this.graphics = playerGraphics(player.user.skin);
 
 		painter.layers.player.addChild(this.graphics.body);
 		this.graphics.body.addChild(this.graphics.eye);
@@ -25,7 +25,7 @@ export class PlayerPainter {
 		this.graphics.body.addChild(this.graphics.normalBody);
 		this.graphics.normalBody.parentGroup = normalGroup;
 
-		this.light = new PointLight(player.skin.color, 0);
+		this.light = new PointLight(player.user.skin.color, 0);
 		this.graphics.body.addChild(this.light);
 
 		this.waterEmitter = new Emitter(painter.layers.bottomParticles, waterParticles);

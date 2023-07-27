@@ -4,7 +4,7 @@ import type { DeathEffect, Player } from "../../..";
 
 
 export function deathParticlesConfig(player: Player, death: DeathEffect): EmitterConfigV3[] {
-	const playerColor = player.skin.color.toString(16);
+	const playerColor = player.user.skin.color.toString(16);
 	const angle = death.angle * 180 / Math.PI;
 	
 	let color = {

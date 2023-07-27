@@ -1,5 +1,5 @@
 import Box2D from "box2dweb";
-import { CATEGORY_BIT, shapeFromVertices, shapesFromConvexVertices } from "../box2d_utils";
+import { CATEGORY_BIT, shapesFromConvexVertices } from "../box2d_utils";
 import { UserData } from "../contact_listener";
 import type { Lake } from "../..";
 

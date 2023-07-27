@@ -24,7 +24,7 @@ export class PlayingPlayer {
     private alive = true;
 
     constructor(private world: Box2D.Dynamics.b2World, player: Player) {
-        this.skin = player.skin;
+        this.skin = player.user.skin;
         this.user = player.user;
         this.swimming = player.swimming;
         this.dashPower = player.dashPower;
@@ -50,7 +50,7 @@ export class PlayingPlayer {
         });
         this.body = world.CreateBody(bodyDef);
 
-        const hitbox = playerHitbox(player.skin);
+        const hitbox = playerHitbox(player.user.skin);
         for (const convexPoly of hitbox) {
             const fixtureDef = new Box2D.Dynamics.b2FixtureDef();
             fixtureDef.shape = shapeFromVertices(convexPoly.flat());
@@ -151,7 +151,6 @@ export class PlayingPlayer {
     }
 
     update(player: Player) {
-        this.skin = player.skin;
         this.user = player.user;
         this.swimming = player.swimming;
         this.dashPower = player.dashPower;
@@ -183,7 +182,6 @@ export class PlayingPlayer {
             velocity: [velocity.x, velocity.y],
             angle: this.body.GetAngle(),
             angularVelocity: this.body.GetAngularVelocity(),
-            skin: this.skin,
             user: this.user,
             dashPower: this.dashPower,
             dashEffects: this.dashEffects,

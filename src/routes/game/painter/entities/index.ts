@@ -6,8 +6,7 @@ import { FrameBoxPainter } from "./frameBox";
 import { LakePainter } from "./lake";
 import { PlayerPainter } from "./player";
 
-export class 
-EntitiesPainter {
+export class EntitiesPainter {
     players = new Map<EntityId, PlayerPainter>();
     boxes = new Map<EntityId, BoxPainter>();
     lakes = new Map<EntityId, LakePainter>();
@@ -41,7 +40,7 @@ EntitiesPainter {
         for (const [id, updatedPlayer] of gameDif.entities.players.updated) {
             this.players.get(id)?.update(updatedPlayer);
         }
-        
+
         if (gameDif.light !== undefined) {
             for (const entityType of ["players", "boxes"] as const) {
                 for (const entity of this[entityType].values()) {
@@ -49,7 +48,7 @@ EntitiesPainter {
                 }
             }
         }
-        
+
         for (const entityType of ["players", "boxes"] as const) {
             for (const id of gameDif.entities[entityType].removed) {
                 this[entityType].get(id)?.destroy();
@@ -65,7 +64,7 @@ EntitiesPainter {
             }
         }
     }
-    
+
     clear() {
         for (const entityType of ["players", "boxes", "lakes", "frameBoxes"] as const) {
             for (const entity of this[entityType].values()) {
@@ -74,7 +73,7 @@ EntitiesPainter {
             this[entityType].clear();
         }
     }
-    
+
     destroy() {
         this.clear();
     }

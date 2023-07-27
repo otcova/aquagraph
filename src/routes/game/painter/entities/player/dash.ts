@@ -5,7 +5,7 @@ import type { DashEffect, Player } from "../../..";
 
 export function dashParticlesConfig(player: Player, dash: DashEffect): EmitterConfigV3[] {
 	const angle = Math.atan2(-dash.direction[1], -dash.direction[0]) * 180 / Math.PI;
-	const playerColor = player.skin.color.toString(16);
+	const playerColor = player.user.skin.color.toString(16);
 
 	let color = {
 		list: [

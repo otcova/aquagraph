@@ -104,7 +104,7 @@ export class HostConnection {
 }
 
 export class GuestConnection {
-
+	t = -Infinity;
 	private game: Game;
 	simulator: Simulator;
 	onClose?: () => void;
@@ -130,8 +130,12 @@ export class GuestConnection {
 		if (message.gameDif) {
 			const gameDif = Object.assign(Object.create(GameDif.prototype), message.gameDif);
 			this.game = gameDif.apply(this.game);
+			
+			if (this.t > this.game.time) console.error("ORDER!!");
+			this.t = this.game.time;
+			
 			this.simulator.updateGame(this.game);
-		} else if (message.changeMinigame) {
+		} else if (message.changeMinigame) {this.t = -Infinity;
 			this.game = message.changeMinigame.game;
 			this.simulator = new Simulator(this.game);
 			if (this.onMinigameChange) this.onMinigameChange(message.changeMinigame.id);

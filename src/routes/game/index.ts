@@ -26,7 +26,6 @@ export type EntityId = number;
 
 export interface Player {
     user: User,
-    skin: PlayerSkin,
     swimming: boolean,
     dashPower: number,
     state: "playing" | "death",
@@ -58,6 +57,7 @@ export interface DeathEffect {
 
 export interface User {
     name: string,
+    skin: PlayerSkin,
 }
 
 export interface Box {
