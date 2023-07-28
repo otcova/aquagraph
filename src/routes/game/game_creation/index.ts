@@ -109,13 +109,19 @@ export function createBoxes(rnd: NextRandom, area: Vec2, amount: number): Box[] 
                 continue TRY_POS;
             }
         }
-
+        
+        const skinIndex = Math.floor(rnd() * 2);
+        const lamps: Vec2[] = [];
+        
+        if (rnd() < 0.5) {
+            lamps.push([6, 6]);
+        }
 
         boxes.push({
             angle: rnd() * Math.PI * 2,
             position,
-            skin: { index: Math.floor(rnd() * 2) },
-            lamps: [],
+            skin: { index: skinIndex },
+            lamps,
         });
         if (boxes.length >= amount) break;
         i = 0;

@@ -79,7 +79,7 @@ export class Lobby implements MinigameTemplate {
 					angle: 0.4,
 					position: [60, -10],
 					skin: { index: 1 },
-					lamps: [[5, 15]],
+					lamps: [[5, 13]],
 				}]]),
 				lakes: new Map([[0, {
 					position: [30, -20],
