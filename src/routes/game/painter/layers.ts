@@ -5,6 +5,7 @@ export class AppLayers {
     lake = new Container();
 
     bottomParticles = new Container();
+    bottomPlayer = new Container();
     player = new Container();
     box = new Container();
     topParticles = new Container();
@@ -21,6 +22,7 @@ export class AppLayers {
             this.lake,
 
             this.bottomParticles,
+            this.bottomPlayer,
             this.player,
             this.box,
             this.topParticles,

@@ -87,7 +87,7 @@ class Lamp {
         this.imgNormal.position.set(-width / 2, 0);
 
         this.imgNormal.parentGroup = normalGroup;
-        this.light.position.set(0, 240);
+        this.light.position.set(0, 330);
     }
 
     animate(deltaTime: number) {

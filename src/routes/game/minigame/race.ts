@@ -21,7 +21,7 @@ export class Race implements MinigameTemplate {
 		const noise = createNoise2D(randGen);
 		this.noise = (x: number, channel: number) => noise(x, channel * 500);
 
-		setTimeout(() => this.start(), 1000);
+		this.start();
 	}
 
 	private start() {
@@ -36,11 +36,11 @@ export class Race implements MinigameTemplate {
 			position: [0, 0],
 			size: initialCameraSize,
 		};
-		
+
 		const frameBoxes = createFrameBoxes(rnd, [100, 100 / cameraRatio]);
-		const boxes = createBoxes(rnd, initialCameraSize, 3 + rnd() * 5);
-		const lakes = createLakes(rnd, initialCameraSize, 10 + rnd() * 10);
-		
+		const boxes = createBoxes(rnd, initialCameraSize, 5 + rnd() * 5);
+		const lakes = createLakes(rnd, initialCameraSize, 20);
+
 		return {
 			camera,
 			entities: {
@@ -66,7 +66,7 @@ export class Race implements MinigameTemplate {
 
 		const w = initialCameraSize[0] / 3;
 		const h = w * cameraRatio;
-		
+
 		const startMove = 20;
 		const maxSpeed = 30;
 		const speed = Math.max(0, Math.min(maxSpeed, game.time - startMove)) / 1000;
@@ -77,7 +77,7 @@ export class Race implements MinigameTemplate {
 		const minSize = 60;
 		const t = (game.time - zoomStart) / zoomTime;
 		const cameraSize = (1 - easeInOutQuad(t)) * (startSize - minSize) + minSize;
-		
+
 		dif.camera = {
 			position: [
 				this.noise(game.time * speed, 0) * w / 2,

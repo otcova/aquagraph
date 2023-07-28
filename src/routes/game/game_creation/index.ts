@@ -55,18 +55,35 @@ import { createRandomBlob, type BlobConfig, randomBlobConfig, createBlob } from 
 
 export function createLakes(rnd: NextRandom, area: Vec2, amount: number): Lake[] {
     const maxTries = 50;
-    
+
     const lakes: Lake[] = [];
     const blobs: [Vec2, BlobConfig][] = [];
-    
+
+    const hx = area[0] / 2, hy = area[1] / 2;
+
     TRY_POS: for (let i = 0; i < maxTries; ++i) {
-        const position: Vec2 = [
+        let position: Vec2 = [
             (rnd() - 0.5) * area[0],
             (rnd() - 0.5) * area[1],
         ];
+
         const blob = randomBlobConfig(rnd);
         const blobR = blob.radius + blob.noiseScale;
-        
+
+        if (blobs.length) {
+            for (let i = 0; i < 10; ++i) {
+                let [neightborPos, neightborBlob] = blobs[Math.floor(rnd() * blobs.length)];
+                const angle = rnd() * Math.PI * 2;
+                const d = neightborBlob.radius + neightborBlob.noiseScale + blobR;
+                position = [
+                    neightborPos[0] + d * Math.cos(angle),
+                    neightborPos[1] + d * Math.sin(angle),
+                ];
+
+                if (-hx <= position[0] && position[0] <= hx && -hy <= position[1] && position[1] < hy) break;
+            }
+        }
+
         for (const [p, b] of blobs) {
             const x = p[0] - position[0];
             const y = p[1] - position[1];
@@ -75,7 +92,7 @@ export function createLakes(rnd: NextRandom, area: Vec2, amount: number): Lake[]
                 continue TRY_POS;
             }
         }
-        
+
         blobs.push([position, blob]);
         lakes.push({
             position,
@@ -84,7 +101,7 @@ export function createLakes(rnd: NextRandom, area: Vec2, amount: number): Lake[]
         if (lakes.length >= amount) break;
         i = 0;
     }
-    
+
     return lakes;
 }
 
@@ -109,10 +126,10 @@ export function createBoxes(rnd: NextRandom, area: Vec2, amount: number): Box[] 
                 continue TRY_POS;
             }
         }
-        
+
         const skinIndex = Math.floor(rnd() * 2);
         const lamps: Vec2[] = [];
-        
+
         if (rnd() < 0.5) {
             lamps.push([6, 6]);
         }

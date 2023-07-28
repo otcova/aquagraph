@@ -3,11 +3,17 @@ import { Emitter } from "@pixi/particle-emitter";
 import type { Painter } from "../..";
 import type { Player } from "../../..";
 import { playerGraphics, type PlayerGraphics } from "../../../skins/player";
-import { EmitterGroup } from "./emitterGroup";
-import { waterParticles } from "./water";
+import { Bow } from "./bow";
 import { dashParticlesConfig } from "./dash";
 import { deathParticlesConfig } from "./death";
+import { EmitterGroup } from "./emitterGroup";
+import { waterParticles } from "./water";
 
+export interface PlayerModule {
+	update?(player: Player): void;
+	animate?(deltaTime: number): void;
+	destroy(): void;
+}
 
 export class PlayerPainter {
 	private graphics: PlayerGraphics;
@@ -15,6 +21,7 @@ export class PlayerPainter {
 	private waterEmitter: Emitter;
 	private emitterGroups: EmitterGroup[] = [];
 	private effectCounter = -Infinity;
+	private modules: PlayerModule[];
 
 	constructor(private painter: Painter, private player: Player) {
 		this.graphics = playerGraphics(player.user.skin);
@@ -27,6 +34,11 @@ export class PlayerPainter {
 
 		this.light = new PointLight(player.user.skin.color, 0);
 		this.graphics.body.addChild(this.light);
+
+		this.modules = [
+			//new Bomb(painter),
+			new Bow(painter),
+		];
 
 		this.waterEmitter = new Emitter(painter.layers.bottomParticles, waterParticles);
 		this.update(player);
@@ -58,6 +70,8 @@ export class PlayerPainter {
 			}
 		}
 		this.effectCounter = newEffectCounter;
+
+		for (const module of this.modules) module.update?.(player);
 	}
 
 	updateLight(light: number) {
@@ -69,6 +83,8 @@ export class PlayerPainter {
 		this.waterEmitter.emit = this.player.swimming && this.graphics.body.visible;
 		this.waterEmitter.update(deltaTime);
 
+		for (const module of this.modules) module.animate?.(deltaTime);
+
 		this.emitterGroups = this.emitterGroups.filter(effect => effect.update(this.player, deltaTime));
 	}
 
@@ -78,6 +94,7 @@ export class PlayerPainter {
 		this.graphics.normalBody.destroy();
 		this.waterEmitter.destroy();
 		for (const emitter of this.emitterGroups) emitter.destroy();
+		for (const module of this.modules) module.destroy();
 	}
 }
 
