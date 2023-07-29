@@ -1,14 +1,12 @@
-import type { Box, Camera, EntityId, FrameBox, Game, Lake, Player } from ".";
+import type { Camera, EntityId, Game, GameEntities } from ".";
+
+type EntitiesType = { [K in keyof GameEntities]:
+        MapDif<EntityId, GameEntities[K] extends Map<any, infer T> ? T : never> };
 
 export class GameDif {
     camera: Camera | undefined;
 
-    entities: {
-        players: MapDif<EntityId, Player>,
-        boxes: MapDif<EntityId, Box>,
-        lakes: MapDif<EntityId, Lake>,
-        frameBoxes: MapDif<EntityId, FrameBox>,
-    };
+    entities: EntitiesType;
 
     light?: number;
     time?: number;
@@ -22,13 +20,16 @@ export class GameDif {
                 boxes: new MapDif(),
                 lakes: new MapDif(),
                 frameBoxes: new MapDif(),
+                coins: new MapDif(),
             };
+            
         } else {
             this.entities = {
                 players: new MapDif(past?.entities.players, current.entities.players),
                 boxes: new MapDif(past?.entities.boxes, current.entities.boxes),
                 lakes: new MapDif(past?.entities.lakes, current.entities.lakes),
                 frameBoxes: new MapDif(past?.entities.frameBoxes, current.entities.frameBoxes),
+                coins: new MapDif(past?.entities.coins, current.entities.coins),
             };
 
             if (past?.time != current.time) this.time = current.time;
@@ -48,6 +49,7 @@ export class GameDif {
                 boxes: MapDif.apply(this.entities.boxes, game.entities.boxes),
                 lakes: MapDif.apply(this.entities.lakes, game.entities.lakes),
                 frameBoxes: MapDif.apply(this.entities.frameBoxes, game.entities.frameBoxes),
+                coins: MapDif.apply(this.entities.coins, game.entities.coins),
             },
             time: this.time ?? game.time,
             light: this.light ?? game.light,

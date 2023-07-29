@@ -2,7 +2,6 @@ import type { Vec2 } from "../utils";
 import type { BoxSkin } from "./skins/box";
 import type { PlayerSkin } from "./skins/player";
 
-
 export interface Game {
     time: number,
     camera: Camera,
@@ -20,6 +19,7 @@ export interface GameEntities {
     boxes: Map<EntityId, Box>,
     lakes: Map<EntityId, Lake>,
     frameBoxes: Map<EntityId, FrameBox>,
+    coins: Map<EntityId, Coin>,
 };
 
 export type EntityId = number;
@@ -79,8 +79,9 @@ export interface Coin {
 }
 
 export enum PowerUp {
-    BOW,
+    BOW = 0,
     BOMB,
+    LENGTH,
 }
 
 export interface Lake {

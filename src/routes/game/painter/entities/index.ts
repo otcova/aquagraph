@@ -29,11 +29,7 @@ const paintersConstructor = {
 export class EntitiesPainter {
     entities = new Map<string, EntityPainter>();
 
-    constructor(private painter: Painter) {
-        this.entities.set("coin1",
-            new CoinPainter(painter, { position: [0, 0], type: 0 })
-        );
-    }
+    constructor(private painter: Painter) { }
 
     updateGame(gameDif: GameDif) {
 

@@ -1,11 +1,11 @@
+import Alea from "alea";
 import { createNoise2D } from "simplex-noise";
 import type { MinigameManager, MinigameTemplate } from ".";
 import type { Camera, Game, Player, User } from "..";
 import { easeInOutQuad, type Vec2 } from "../../utils";
 import { GameDif } from "../dif";
 import { createBoxes, createFrameBoxes, createLakes } from "../game_creation";
-import { randomPlayerSpawn } from "./utils";
-import Alea from "alea";
+import { randomCoin, randomPlayerSpawn } from "./utils";
 
 const cameraRatio = 1.8;
 const initialCameraSize: Vec2 = [140 * cameraRatio, 140];
@@ -48,6 +48,7 @@ export class Race implements MinigameTemplate {
 				boxes: new Map(boxes.map((v, i) => [i, v])),
 				lakes: new Map(lakes.map((v, i) => [i, v])),
 				frameBoxes: new Map(frameBoxes.map((v, i) => [i, v])),
+				coins: new Map(),
 			},
 			time: 0,
 			light: 0.2 + rnd() * 0.4,
@@ -63,6 +64,13 @@ export class Race implements MinigameTemplate {
 		const game = simulator.game;
 		const dif = new GameDif();
 
+		if (this.manager.host) {
+			const coinsPerSecond = 1 / 10;
+			if (Math.random() < coinsPerSecond*deltaTime && game.entities.coins.size < 3) {
+				const coin = randomCoin(game);
+				if (coin) dif.entities.coins.added.push([Math.floor(game.time*10000), coin]);
+			}
+		}
 
 		const w = initialCameraSize[0] / 3;
 		const h = w * cameraRatio;

@@ -1,6 +1,6 @@
 import Box2D from "box2dweb";
 
-export type ContactType = "screen" | "box" | "lake" | "player" | "frameBox";
+export type ContactType = "screen" | "box" | "coin" | "lake" | "player" | "frameBox";
 
 export class UserData {
     beginContactType?: (type: ContactType) => void;

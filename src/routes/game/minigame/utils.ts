@@ -1,6 +1,6 @@
-import type { Game, Lake, Player, User } from "..";
-import { pointInsideTriangle, type Vec2 } from "../../utils";
 import { utils } from "pixi.js";
+import { PowerUp, type Coin, type Game, type Lake, type Player, type User } from "..";
+import { pointInsideTriangle, type NextRandom, type Vec2 } from "../../utils";
 
 export function randomPlayerSpawn(game: Game, user: User): Player {
 	const maxTries = 400;
@@ -70,6 +70,38 @@ export function randomPlayerSpawn(game: Game, user: User): Player {
 		deathEffects: [],
 		move: [0, 0],
 	};
+}
+
+export function randomCoin(game: Game, rnd: NextRandom = Math.random): Coin | undefined {
+	let coin: Coin | undefined;
+	
+	const maxTries = 20;
+	const sqMinPlayerDistance = 5 ** 2;
+	
+    TRY_POS: for (let i = 0; i < maxTries; ++i) {
+
+        const position: Vec2 = [
+            (rnd() - 0.5) * 0.8*game.camera.size[0] + game.camera.position[0],
+            (rnd() - 0.5) * 0.8*game.camera.size[1] + game.camera.position[1],
+        ];
+
+
+        if (boxesCollision(position, game)) continue;
+		
+		for (const player of game.entities.players.values()) {
+			const x = player.position[0] - position[0];
+			const y = player.position[1] - position[1];
+			if (x * x + y * y < sqMinPlayerDistance) continue TRY_POS;
+		}
+
+		coin = {
+			position,
+			type: rnd() * PowerUp.LENGTH,
+		};
+        break;
+    }
+
+    return coin;
 }
 
 function boxesCollision(pos: Vec2, game: Game): boolean {

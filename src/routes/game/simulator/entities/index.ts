@@ -2,6 +2,7 @@ import type Box2D from "box2dweb";
 import type { EntityId, GameEntities, Player } from "../..";
 import type { GameDif } from "../../dif";
 import { BoxSimulator } from "./box";
+import { CoinSimulator } from "./coin";
 import { FrameBoxSimulator } from "./frameBox";
 import { LakeSimulator } from "./lake";
 import { PlayerSimulator } from "./player";
@@ -11,6 +12,7 @@ export class EntitiesSimulator {
     boxes = new Map<EntityId, BoxSimulator>();
     lakes = new Map<EntityId, LakeSimulator>();
     frameBoxes = new Map<EntityId, FrameBoxSimulator>();
+    coins = new Map<EntityId, CoinSimulator>();
 
     constructor(private world: Box2D.Dynamics.b2World) { }
     update(gameDif: GameDif) {
@@ -32,6 +34,10 @@ export class EntitiesSimulator {
         for (const [id, newBox] of gameDif.entities.frameBoxes.added) {
             const box = new FrameBoxSimulator(this.world, newBox);
             this.frameBoxes.set(id, box);
+        }        
+        for (const [id, newCoin] of gameDif.entities.coins.added) {
+            const box = new CoinSimulator(this.world, newCoin);
+            this.coins.set(id, box);
         }
         
         // Update Players --------------------
@@ -45,7 +51,7 @@ export class EntitiesSimulator {
         }
 
         // Delete Entities --------------------
-        for (const entityType of ["players", "boxes", "lakes"] as const) {
+        for (const entityType of ["players", "boxes", "lakes", "frameBoxes", "coins"] as const) {
             for (const id of gameDif.entities[entityType].removed) {
                 this[entityType].get(id)?.destroy();
                 this[entityType].delete(id);
@@ -72,6 +78,7 @@ export class EntitiesSimulator {
             boxes: mapKeys(this.boxes, box => box.recordState()),
             lakes: mapKeys(this.lakes, lake => lake.recordState()),
             frameBoxes: mapKeys(this.frameBoxes, box => box.recordState()),
+            coins: mapKeys(this.coins, coin => coin.recordState()),
         };
     }
 }

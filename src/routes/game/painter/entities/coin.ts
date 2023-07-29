@@ -27,8 +27,11 @@ export class CoinPainter {
 		this.t += dt;
 
 		const n = Math.min(1, easeInOutQuad(this.t));
-		this.graphics.scale.set(n);
-		this.light.brightness = n;
+		
+		if (this.light.brightness != n) {
+			this.graphics.scale.set(n);
+			this.light.brightness = n;
+		}
 		
 		const [x, y] = this.coin.position;
 		const t = 10 + 1 * this.t;

@@ -1,7 +1,7 @@
 import Box2D from "box2dweb";
+import type { Camera } from "..";
 import { CATEGORY_BIT } from "./box2d_utils";
 import { UserData } from "./contact_listener";
-import type { Camera } from "..";
 
 const size = 100;
 
@@ -44,7 +44,7 @@ function newFrameFixture(): Box2D.Dynamics.b2FixtureDef {
 	fixtureDef.density = 0;
 	fixtureDef.isSensor = true;
 
-	fixtureDef.filter.categoryBits = CATEGORY_BIT.SCREEN;
+	fixtureDef.filter.categoryBits = CATEGORY_BIT.NONE;
 	fixtureDef.filter.maskBits = CATEGORY_BIT.PLAYER;
 	return fixtureDef;
 }

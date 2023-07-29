@@ -38,8 +38,6 @@ export function shapeFromVertices(vertices: ArrayLike<number>) {
 }
 
 export const CATEGORY_BIT = {
-    LAKE: 1 << 0,
+    NONE: 1,
     PLAYER: 1 << 1,
-    BOX: 1 << 2,
-    SCREEN: 1 << 3,
 } as const;

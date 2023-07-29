@@ -89,6 +89,7 @@ export class Lobby implements MinigameTemplate {
 					vertices: createRandomBlob(4),
 				}]]),
 				frameBoxes: new Map(frameBoxes.map((v, i) => [i, v])),
+				coins: new Map(),
 			},
 			time: 0,
 			light: 0.5,

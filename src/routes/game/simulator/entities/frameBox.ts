@@ -15,7 +15,7 @@ export class FrameBoxSimulator {
         const fixtureDef = new Box2D.Dynamics.b2FixtureDef();
         fixtureDef.shape = this.createShape(1);
         fixtureDef.density = 0;
-        fixtureDef.filter.categoryBits = CATEGORY_BIT.BOX;
+        fixtureDef.filter.categoryBits = CATEGORY_BIT.NONE;
         fixtureDef.filter.maskBits = CATEGORY_BIT.PLAYER;
         fixtureDef.isSensor = true;
 
