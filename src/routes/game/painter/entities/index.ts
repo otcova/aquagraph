@@ -1,88 +1,80 @@
 import type { Painter } from "..";
-import type { EntityId } from "../..";
 import type { GameDif } from "../../dif";
 import { BoxPainter } from "./box";
+import { CoinPainter } from "./coin";
 import { FrameBoxPainter } from "./frameBox";
 import { LakePainter } from "./lake";
 import { PlayerPainter } from "./player";
 
-export class EntitiesPainter {
-    players = new Map<EntityId, PlayerPainter>();
-    boxes = new Map<EntityId, BoxPainter>();
-    lakes = new Map<EntityId, LakePainter>();
-    frameBoxes = new Map<EntityId, FrameBoxPainter>();
+interface EntityPainter {
+    // new(painter: Painter, entity: EntityData): void
+    update?(data: any): void;
 
-    constructor(private painter: Painter) { }
+    lightUpdate?(brightness: number): void;
+
+    /// Amount of seconds between the frames
+    animate?(deltaTime: number): void;
+
+    destroy(): void;
+}
+
+const paintersConstructor = {
+    players: PlayerPainter,
+    boxes: BoxPainter,
+    lakes: LakePainter,
+    frameBoxes: FrameBoxPainter,
+    coins: CoinPainter,
+};
+
+export class EntitiesPainter {
+    entities = new Map<string, EntityPainter>();
+
+    constructor(private painter: Painter) {
+        this.entities.set("coin1",
+            new CoinPainter(painter, { position: [0, 0], type: 0 })
+        );
+    }
 
     updateGame(gameDif: GameDif) {
-        // Create Painters ------------------
-        for (const [id, newLake] of gameDif.entities.lakes.added) {
-            const painter = new LakePainter(this.painter, newLake);
-            this.lakes.set(id, painter);
-        }
 
-        for (const [id, newPlayer] of gameDif.entities.players.added) {
-            const painter = new PlayerPainter(this.painter, newPlayer);
-            this.players.set(id, painter);
-        }
+        for (const entityNameStr in gameDif.entities) {
+            const entityName = entityNameStr as keyof typeof gameDif.entities;
 
-        for (const [id, newBox] of gameDif.entities.boxes.added) {
-            const painter = new BoxPainter(this.painter, newBox);
-            this.boxes.set(id, painter);
-        }
+            // Create Entity Painters ------------------
+            for (const [id, newEntity] of gameDif.entities[entityName].added) {
+                this.entities.get(entityName + id)?.destroy();
 
-        for (const [id, newBox] of gameDif.entities.frameBoxes.added) {
-            const painter = new FrameBoxPainter(this.painter, newBox);
-            this.frameBoxes.set(id, painter);
-        }
+                const Paintor = paintersConstructor[entityName];
+                this.entities.set(entityName + id, new Paintor(this.painter, newEntity as any));
+            }
 
-        // Update Painters ---------------
-        for (const [id, updatedPlayer] of gameDif.entities.players.updated) {
-            this.players.get(id)?.update(updatedPlayer);
+            // Update Entity Painters ------------------
+            for (const [id, updatedEntity] of gameDif.entities[entityName].updated) {
+                this.entities.get(entityName + id)?.update?.(updatedEntity);
+            }
+
+            // Remove Entity Painters ------------------
+            for (const id of gameDif.entities[entityName].removed) {
+                this.entities.get(entityName + id)?.destroy();
+                this.entities.delete(entityName + id);
+            }
         }
 
         if (gameDif.light !== undefined) {
-            for (const entityType of ["players", "boxes"] as const) {
-                for (const entity of this[entityType].values()) {
-                    entity.updateLight(gameDif.light);
-                }
+            for (const entity of this.entities.values()) {
+                entity.lightUpdate?.(gameDif.light);
             }
-        }
-
-        for (const entityType of ["players", "boxes"] as const) {
-            for (const id of gameDif.entities[entityType].removed) {
-                this[entityType].get(id)?.destroy();
-                this[entityType].delete(id);
-            }
-        }
-
-        // Delete Painters ------------------
-        for (const entityType of ["players", "boxes", "lakes"] as const) {
-            for (const id of gameDif.entities[entityType].removed) {
-                this[entityType].get(id)?.destroy();
-                this[entityType].delete(id);
-            }
-        }
-    }
-
-    clear() {
-        for (const entityType of ["players", "boxes", "lakes", "frameBoxes"] as const) {
-            for (const entity of this[entityType].values()) {
-                entity.destroy();
-            }
-            this[entityType].clear();
         }
     }
 
     destroy() {
-        this.clear();
+        for (const entity of this.entities.values()) entity.destroy();
+        this.entities.clear();
     }
 
     animate(stepTime: number) {
-        for (const entityType of ["players", "lakes", "boxes"] as const) {
-            for (const entity of this[entityType].values()) {
-                entity.animate(stepTime);
-            }
+        for (const entity of this.entities.values()) {
+            entity.animate?.(stepTime);
         }
     }
 }

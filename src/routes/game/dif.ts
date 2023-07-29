@@ -1,5 +1,4 @@
 import type { Box, Camera, EntityId, FrameBox, Game, Lake, Player } from ".";
-import type { Vec2 } from "../utils";
 
 export class GameDif {
     camera: Camera | undefined;

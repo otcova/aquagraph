@@ -31,11 +31,9 @@ export class BoxPainter {
         painter.layers.box.addChild(this.container);
         this.container.addChild(this.graphics.diffuse);
         this.container.addChild(this.graphics.normal);
-
-        this.updateLight(painter.sceneLight.brightness);
     }
 
-    updateLight(light: number) {
+    lightUpdate(light: number) {
         for (const lamp of this.lamps) {
             lamp.setBrightness(2 * (1 - light));
         }

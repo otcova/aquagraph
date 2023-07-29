@@ -5,7 +5,7 @@ import { easeInOutQuad, type Vec2 } from "../../utils";
 import { GameDif } from "../dif";
 import { createBoxes, createFrameBoxes, createLakes } from "../game_creation";
 import { randomPlayerSpawn } from "./utils";
-import alea, { } from "alea";
+import Alea from "alea";
 
 const cameraRatio = 1.8;
 const initialCameraSize: Vec2 = [140 * cameraRatio, 140];
@@ -16,7 +16,7 @@ export class Race implements MinigameTemplate {
 	noise: (x: number, channel: number) => number;
 
 	constructor(private manager: MinigameManager, seed: number) {
-		const randGen = alea(seed);
+		const randGen = Alea(seed);
 		this.random = randGen.next;
 		const noise = createNoise2D(randGen);
 		this.noise = (x: number, channel: number) => noise(x, channel * 500);
@@ -31,7 +31,7 @@ export class Race implements MinigameTemplate {
 	}
 
 	static initialGame(seed: number): Game {
-		const rnd = alea(seed).next;
+		const rnd = Alea(seed).next;
 		const camera: Camera = {
 			position: [0, 0],
 			size: initialCameraSize,

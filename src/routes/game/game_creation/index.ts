@@ -1,57 +1,6 @@
-import type { Box, Camera, FrameBox, Game, Lake, Player } from "..";
+import type { Box, FrameBox, Lake } from "..";
 import { randomRange, type NextRandom, type Vec2 } from "../../utils";
-import { createRandomBlob, type BlobConfig, randomBlobConfig, createBlob } from "./lake";
-
-// export function gameFrameExample(): Game {
-//     const camera: Camera = {
-//         position: [0, 0],
-//         size: [120 * 1.8, 120],
-//     };
-
-//     const boxes: Box[] = [{
-//         skin: { index: 1 },
-//         position: [-50, 20],
-//         angle: -0.3,
-//         lamps: [[0, 4]],
-//     }, {
-//         skin: { index: 1 },
-//         position: [40, -50],
-//         angle: 1.2,
-//         lamps: [[14, 14]],
-//     }, {
-//         skin: { index: 0 },
-//         position: [35, 10],
-//         angle: 0.1,
-//     }];
-
-//     const lakes: Lake[] = [{
-//         position: [30, 20],
-//         vertices: createRandomBlob(0),
-//     }, {
-//         position: [-30, 20],
-//         vertices: createRandomBlob(1),
-//     }, {
-//         position: [30, -30],
-//         vertices: createRandomBlob(2),
-//     }, {
-//         position: [-40, -20],
-//         vertices: createRandomBlob(3),
-//     }];
-
-//     const frameBoxes = createFrameBoxes([100, 100 * camera.size[1] / camera.size[0]]);
-
-//     return {
-//         camera,
-//         entities: {
-//             players: new Map(),
-//             boxes: new Map(boxes.map((v, i) => [i, v])),
-//             lakes: new Map(lakes.map((v, i) => [i, v])),
-//             frameBoxes: new Map(frameBoxes.map((v, i) => [i, v])),
-//         },
-//         time: 0,
-//         light: 0.4,
-//     };
-// }
+import { createBlob, randomBlobConfig, type BlobConfig } from "./lake";
 
 export function createLakes(rnd: NextRandom, area: Vec2, amount: number): Lake[] {
     const maxTries = 50;

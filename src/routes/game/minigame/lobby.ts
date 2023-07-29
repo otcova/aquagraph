@@ -58,7 +58,7 @@ export class Lobby implements MinigameTemplate {
 
 	static initialGame(seed: number = Math.random()): Game {
 		const rnd = Alea(seed).next;
-		
+
 		const camera: Camera = {
 			position: [0, 0],
 			size: [110 * 1.8, 110],
@@ -120,7 +120,7 @@ export class Lobby implements MinigameTemplate {
 		if (!id) this.setMainScreen();
 
 		this.applyUI(ui => ui.hide());
-		
+
 		this.ui.nameInput.show();
 		this.ui.partyIdText.show();
 		this.ui.playButton.show();
@@ -177,7 +177,7 @@ export class Lobby implements MinigameTemplate {
 		if (!this.ui.partyIdInput.text) return;
 
 		this.applyUI(ui => ui.hide());
-		
+
 		this.ui.nameInput.show();
 		this.ui.partyIdText.show();
 		this.ui.partyIdText.updateText("Connecting ...");

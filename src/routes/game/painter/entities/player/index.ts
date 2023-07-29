@@ -42,7 +42,6 @@ export class PlayerPainter {
 
 		this.waterEmitter = new Emitter(painter.layers.bottomParticles, waterParticles);
 		this.update(player);
-		this.updateLight(painter.sceneLight.brightness);
 	}
 
 	update(player: Player) {
@@ -74,7 +73,7 @@ export class PlayerPainter {
 		for (const module of this.modules) module.update?.(player);
 	}
 
-	updateLight(light: number) {
+	lightUpdate(light: number) {
 		this.light.brightness = 0.6 * (1 - light);
 	}
 

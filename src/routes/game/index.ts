@@ -73,6 +73,16 @@ export interface FrameBox {
     color: number,
 }
 
+export interface Coin {
+    position: Vec2,
+    type: PowerUp,
+}
+
+export enum PowerUp {
+    BOW,
+    BOMB,
+}
+
 export interface Lake {
     position: Vec2,
     vertices: Float32Array,

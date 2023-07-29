@@ -116,7 +116,8 @@ export class Painter {
 
     reset() {
         this.previousGameDrawn = undefined;
-        this.entities.clear();
+        this.entities.destroy();
+        this.entities = new EntitiesPainter(this);
     }
 
     private update() {
