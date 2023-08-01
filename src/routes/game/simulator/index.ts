@@ -33,12 +33,16 @@ export class Simulator {
 
     updateGame(game: Game) {
         if (this.game != game) {
+            const deltaTime = Math.max(0, this.game.time - game.time);
+            console.log(deltaTime);
+            
             const gameDif = new GameDif(this.game, game);
             this.game = game;
-            this.lastUpdateTime = performance.now() / 1000;
 
             if (gameDif.camera) this.frameCollision.update(gameDif.camera);
             this.entities.update(gameDif);
+            
+            this.step(deltaTime);
         }
     }
 
@@ -54,20 +58,23 @@ export class Simulator {
         const now = performance.now() / 1000;
         if (this.lastUpdateTime) {
             const deltaTime = now - this.lastUpdateTime;
-
-            // If lowering this, check: https://gamedev.stackexchange.com/questions/194011/what-could-effectively-affect-the-falling-speed-of-a-b2body
-            const stepsPerFrame = 40;
-
-            this.step(stepsPerFrame, deltaTime / stepsPerFrame);
+            this.step(deltaTime);
         }
         this.lastUpdateTime = now;
     }
 
-    private step(num_of_steps: number, timeStep: number) {
+    private step(time: number) {
+        // If increasing this, check: https://gamedev.stackexchange.com/questions/194011/what-could-effectively-affect-the-falling-speed-of-a-b2body
+        const maxStepTime = 0.004;
+        
         const velocityIterations = 6;
         const positionIterations = 2;
+        
+        const stepsCount = Math.ceil(time / maxStepTime);
+        const timeStep = time / stepsCount;
+        
 
-        for (let i = 0; i < num_of_steps; ++i) {
+        for (let i = 0; i < stepsCount; ++i) {
             this.beforeStep?.(timeStep);
             this.entities.step(timeStep);
             this.world.Step(timeStep, velocityIterations, positionIterations);
